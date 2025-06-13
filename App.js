@@ -1,11 +1,10 @@
-import React from "react";
 import AppNavigator from "./navigation/AppNavigator";
-import { UserProvider } from "./services/UserContext";
+import { CheckInfoProvider } from "./services/UserContext";
 
 export default function App() {
   return (
-    <UserProvider>
+    <CheckInfoProvider>
       <AppNavigator />
-    </UserProvider>
+    </CheckInfoProvider>
   );
 }

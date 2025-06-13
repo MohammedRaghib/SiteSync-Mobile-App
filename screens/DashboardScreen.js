@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { useUser } from '../services/UserContext';
+import useCheckInfo from '../services/UserContext';
 
 export default function UsersTableScreen() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useUser();
+  const { user } = useCheckInfo();
 
   useEffect(() => {
     const fetchData = async () => {
