@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Button, StyleSheet, Text } from "react-native";
 import useCheckInfo from "../services/UserContext";
 

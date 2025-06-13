@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import useCheckInfo from '../services/UserContext';
 
-export default function UsersTableScreen() {
+export default function DashboardScreen() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useCheckInfo();

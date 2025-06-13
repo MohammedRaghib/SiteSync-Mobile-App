@@ -10,14 +10,14 @@ import {
   View,
 } from "react-native";
 import useCheckInfo from "../services/UserContext";
+import SwitchLanguage from "../Language/SwitchLanguage";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const { setUser, loggedIn, setLoggedIn, user } = useCheckInfo();
   const { t } = useTranslation();
 
-  const BACKEND_API_URL =
-    "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -111,6 +111,7 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       )}
+      <SwitchLanguage />
     </>
   );
 };

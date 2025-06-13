@@ -10,11 +10,13 @@ export function CheckInfoProvider({ children }) {
     access: "",
     refresh: "",
   });
-  const BACKEND_API_URL = "https://django.angelightrading.com/home/angeligh/djangoapps/api/";
-  
+  const BACKEND_API_URL =
+    "https://django.angelightrading.com/home/angeligh/djangoapps/api/";
+
   const hasAccess = ({ requiresLogin = true, allowedRoles = [] }) => {
     if (requiresLogin && !loggedIn) return false;
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) return false;
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role))
+      return false;
     return true;
   };
 
@@ -48,10 +50,16 @@ export function CheckInfoProvider({ children }) {
     }
   };
 
-
   return (
     <CheckInfo.Provider
-      value={{ user, setUser, loggedIn, setLoggedIn, hasAccess, refreshAccessToken }}
+      value={{
+        user,
+        setUser,
+        loggedIn,
+        setLoggedIn,
+        hasAccess,
+        refreshAccessToken,
+      }}
     >
       {children}
     </CheckInfo.Provider>
