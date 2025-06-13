@@ -1,7 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import useCheckInfo from "../services/UserContext";
 
 const LoginScreen = () => {
@@ -9,7 +16,8 @@ const LoginScreen = () => {
   const { setUser, loggedIn, setLoggedIn, user } = useCheckInfo();
   const { t } = useTranslation();
 
-  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  const BACKEND_API_URL =
+    "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -21,20 +29,24 @@ const LoginScreen = () => {
       setErrorMessage(t("errors.errorRequired"));
       return;
     }
-    setErrorMessage('');
+    setErrorMessage("");
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('username', username)
-      formData.append('password', password)
+      formData.append("username", username);
+      formData.append("password", password);
 
       const userResponse = await fetch(`${BACKEND_API_URL}login/`, {
         method: "POST",
-        body: formData
+        body: formData,
       });
 
       if (!userResponse.ok) {
-        throw new Error(t("errors." + userResponse.error_type));
+        const errorText = await userResponse.text();
+        console.error("❌ Login failed");
+        console.error("Status Code:", userResponse.status);
+        console.error("Response Body:", errorText);
+        throw new Error(`Login failed: ${userResponse.status}`);
       }
 
       setErrorMessage("");
@@ -44,7 +56,7 @@ const LoginScreen = () => {
       const newUser = {
         id: person_id,
         role: role_name,
-      }
+      };
       setLoggedIn(true);
       setUser((prevUser) => ({
         ...prevUser,
@@ -61,7 +73,6 @@ const LoginScreen = () => {
       setLoading(false);
     }
   };
-
 
   return (
     <>
@@ -81,14 +92,21 @@ const LoginScreen = () => {
             onChangeText={setPassword}
           />
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>{loading ? t("ui.loading") : (t("auth.login"))}</Text>
+            <Text style={styles.buttonText}>
+              {loading ? t("ui.loading") : t("auth.login")}
+            </Text>
           </TouchableOpacity>
-          {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+          {errorMessage ? (
+            <Text style={styles.error}>{errorMessage}</Text>
+          ) : null}
         </View>
       ) : (
         <View style={styles.container}>
           <Text>{t("auth.alreadyLoggedIn")}</Text>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Home")}
+          >
             <Text style={styles.buttonText}>{t("ui.dashboard")}</Text>
           </TouchableOpacity>
         </View>
