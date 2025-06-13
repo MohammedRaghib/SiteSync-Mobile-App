@@ -1,0 +1,61 @@
+{
+  "auth": {
+    "username": "用户名",
+    "password": "密码",
+    "login": "登录",
+    "alreadyLoggedIn": "您已登录。",
+    "successLogin": "登录成功。欢迎！"
+  },
+  "ui": {
+    "dashboard": "仪表板",
+    "status": "状态",
+    "name": "姓名",
+    "actions": "操作",
+    "capturePhoto": "拍照",
+    "neutralExpression": "保持中性面部表情",
+    "selectLanguage": "选择语言",
+    "grantPermission": "授予权限",
+    "AllPermissions": "相机和位置权限都需要",
+    "loading": "加载中...",
+    "noData": "无可用数据",
+    "selectAll": "全选",
+    "specialReEntry": "特殊再入",
+    "noEquipment": "未分配设备",
+    "submit": "提交"
+  },
+  "attendance": {
+    "checkIn": "签入",
+    "checkOut": "签出",
+    "checkinSuccess": "人员已签入",
+    "checkoutSuccess": "人员已签出",
+    "late_check_in": "已记录迟到签入",
+    "check_in_success": "签入成功。",
+    "check_out_success": "签出成功。",
+    "supervisorTaskCheck": "主管任务检查"
+  },
+  "errors": {
+    "fetchError": "获取数据失败。",
+    "serverError": "服务器发生错误。",
+    "recognitionFailed": "人脸识别失败",
+    "noName": "未知人员",
+    "errorRequired": "用户名和密码不能为空。",
+    "errorLoginFailed": "登录失败。请检查您的凭据。",
+    "invalid_credentials": "无效的用户名或密码。",
+    "authError": "发生身份验证错误。",
+    "unsupported_role": "其他角色登录成功。",
+    "user_profile_incomplete": "用户资料不完整。",
+    "role_info_missing": "缺少用户角色信息。",
+    "supervisor_checkout_missing": "主管签出前无法签出。",
+    "unauthorizedWorker": "未经授权的工人",
+    "await_supervisor_permission": "等待主管许可。",
+    "outside_project_area": "考勤不能在项目区域外进行。",
+    "checkoutFailure": "签出失败",
+    "checkinFailure": "签入失败",
+    "worker_id_required": "需要工人ID。",
+    "worker_not_found": "未找到工人。",
+    "monitor_not_found": "未找到监视器。",
+    "subject_not_found": "未找到主题。",
+    "location_missing": "必须提供当前位置。",
+    "project_not_found": "未找到项目。"
+  }
+}
