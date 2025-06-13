@@ -1,85 +1,139 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import useCheckInfo from '../services/UserContext';
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, Text, View } from "react-native";
+import useCheckInfo from "../services/UserContext";
 
-export default function DashboardScreen() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useCheckInfo();
+const DashboardScreen = () => {
+  const navigation = useNavigation();
+  const { t } = useTranslation();
+  const { user, loggedIn, hasAccess, refreshAccessToken } = useCheckInfo();
+
+  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+
+  const [AttendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const fetchAttendance = async () => {
+    // console.log(user);
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      const peopleResponse = await fetch(
+        `${BACKEND_API_URL}supervisor_dashboard/`, {
+        method: "GET",
+      }
+      );
+
+      if (!peopleResponse.ok) {
+        setErrorMessage(t("errors.fetchError"));
+        throw new Error(t("errors.fetchError"));
+      }
+
+      const jsonAttendanceData = await peopleResponse.json();
+      setAttendanceData(jsonAttendanceData.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const username = user?.username;
-        const password = user?.password;
+    if (!hasAccess({ requiresLogin: true, allowedRoles: ["supervisor"] })) {
+      navigation.navigate("CheckIn");
+    }
+  }, [user, loggedIn]);
 
-        const tokenResponse = await fetch('https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/token/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        });
-
-        const tokenData = await tokenResponse.json();
-        const access = tokenData.access;
-
-        const dataResponse = await fetch('https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/supervisor_dashboard/', {
-          headers: {
-            Authorization: `Bearer ${access}`,
-          },
-        });
-
-        const json = await dataResponse.json();
-        setData(json.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [user]);
-
-  if (loading) return <ActivityIndicator size="large" style={{ marginTop: 40 }} />;
+  useEffect(() => {
+    fetchAttendance();
+  }, []);
 
   return (
-    <ScrollView horizontal>
-      <View>
-        {/* Table Header */}
-        <View style={[styles.row, styles.headerRow]}>
-          <Text style={[styles.cell, styles.header]}>ID</Text>
-          <Text style={[styles.cell, styles.header]}>Name</Text>
-          <Text style={[styles.cell, styles.header]}>Role</Text>
-        </View>
-        {Array.isArray(data) && data.map((item, index) => (
-        <View key={index} style={styles.row}>
-          <Text style={styles.cell}>{item.attendance_subject.person_name}</Text>
-          <Text style={styles.cell}>
-          {item.attendance_is_check_in ? 'Checked In' : 'Checked Out'}
-        </Text>
-    </View>
-))}
+    <View style={styles.container}>
+      <Text style={styles.title}>{t("ui.dashboard")}</Text>
+
+      <View style={styles.header}>
+        <Text style={styles.headerText}>{t("ui.name")}</Text>
+        <Text style={styles.headerText}>{t("ui.status")}</Text>
       </View>
-    </ScrollView>
+
+      {loading ? (
+        <Text style={styles.loading}>{t("ui.loading")}</Text>
+      ) : errorMessage ? (
+        <Text style={styles.error}>{errorMessage}</Text>
+      ) : AttendanceData.length > 0 ? (
+        AttendanceData.map((attendance) => (
+          <View key={attendance.attendance_subject?.person_id} style={styles.item}>
+            <Text style={styles.name}>{attendance.attendance_subject?.person_name}</Text>
+            <Text style={styles.status}>{attendance.attendance_is_check_in ? t("attendance.checkIn") : t("attendance.checkOut")}</Text>
+          </View>
+        ))
+      ) : (
+        <Text style={styles.noData}>{t("ui.noData")}</Text>
+      )}
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    paddingVertical: 8,
-  },
-  cell: {
+  container: {
     flex: 1,
-    paddingHorizontal: 10,
+    backgroundColor: "#f4f4f4",
+    padding: 20,
+    alignItems: "center",
   },
-  headerRow: {
-    backgroundColor: '#f0f0f0',
-    borderBottomWidth: 2,
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
   },
   header: {
-    fontWeight: 'bold',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    width: "100%",
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  item: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    width: "100%",
+  },
+  name: {
+    fontSize: 16,
+  },
+  status: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#007AFF",
+  },
+  loading: {
+    fontSize: 16,
+    fontStyle: "italic",
+    color: "#666",
+  },
+  error: {
+    fontSize: 16,
+    color: "red",
+    marginVertical: 10,
+  },
+  noData: {
+    fontSize: 16,
+    fontStyle: "italic",
+    color: "#666",
   },
 });
+
+export default DashboardScreen;
