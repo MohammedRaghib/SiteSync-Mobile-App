@@ -33,7 +33,7 @@ const LoginScreen = () => {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("username", username);
+      formData.append("username", username.trim());
       formData.append("password", password);
 
       const userResponse = await fetch(`${BACKEND_API_URL}login/`, {
@@ -81,12 +81,14 @@ const LoginScreen = () => {
           <TextInput
             style={styles.input}
             placeholder={t("auth.username")}
+            placeholderTextColor={"black"}
             value={username}
             onChangeText={setUsername}
           />
           <TextInput
             style={styles.input}
             placeholder={t("auth.password")}
+            placeholderTextColor={"black"}
             secureTextEntry
             value={password}
             onChangeText={setPassword}

@@ -8,6 +8,7 @@
   },
   "ui": {
     "dashboard": "Dashboard",
+    "taskCheck": "Task Check",
     "status": "Status",
     "name": "Name",
     "actions": "Actions",
