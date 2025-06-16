@@ -51,7 +51,7 @@ const DashboardScreen = () => {
 
     try {
       const absenteesResponse = await fetch(
-        `${BACKEND_API_URL}project_absentees/`,
+        `${BACKEND_API_URL}project_absentees?supervisor_id=${user?.id}`,
         {
           method: "GET",
         }
