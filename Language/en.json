@@ -23,7 +23,9 @@
     "allEquipmentReturned":"All equipment returned",
     "specialReEntry": "Special Re-Entry",
     "noEquipment": "No equipment assigned",
-    "submit": "Submit"
+    "submit": "Submit",
+    "absentees": "Absentees",
+    "back": "Back"
   },
   "attendance": {
     "checkIn": "Check In",
