@@ -135,7 +135,15 @@ const DashboardScreen = () => {
                   <Text style={styles.status}>
                     {attendance.attendance_is_check_in
                       ? t("attendance.checkIn")
-                      : t("attendance.checkOut")}
+                      : t("attendance.checkOut")}{" "}
+                    -{" "}
+                    {new Date(
+                      attendance.attendance_timestamp
+                    ).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
                   </Text>
                 </View>
               ))
