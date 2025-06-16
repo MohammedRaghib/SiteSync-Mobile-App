@@ -1,11 +1,20 @@
-import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage } from './i18n';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
-  { code: 'zh', label: '中文' },
+  { code: 'zh', label: '中文 (Chinese)' },
+  { code: 'es', label: 'Español (Spanish)' },
+  { code: 'ar', label: '(Arabic) العربية' },
+  { code: 'fr', label: 'Français (French)' },
+  { code: 'ru', label: 'Русский (Russian)' },
+  { code: 'pt', label: 'Português (Portugese)' },
+  { code: 'hi', label: 'हिन्दी (Hindi)' },
+  { code: 'bn', label: 'বাংলা (Bangla)' },
+  { code: 'de', label: 'Deutsch (German)' },
+  { code: 'ja', label: '日本語 (Japanese)' },
 ];
 
 const SwitchLanguage = () => {
