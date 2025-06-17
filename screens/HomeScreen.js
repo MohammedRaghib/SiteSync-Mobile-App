@@ -15,7 +15,7 @@ function HomeScreen() {
         <>
           <TouchableOpacity
             style={styles.link}
-            onPress={() => navigation.navigate("Dashboard")}
+            onPress={() => navigation.navigate("SpecialReEntry")}
           >
             <Text style={styles.text}>{t("ui.specialReEntry")}</Text>
           </TouchableOpacity>
