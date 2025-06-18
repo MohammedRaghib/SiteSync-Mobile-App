@@ -63,6 +63,9 @@
     "monitor_not_found": "Monitor not found.",
     "subject_not_found": "No subject found.",
     "location_missing": "Current location must be provided.",
-    "project_not_found": "Project not found."
+    "project_not_found": "Project not found.",
+    "missing_parameters": "Missing parameters in the request.",
+    "supervisor_no_project": "Supervisor does not have a project assigned.",
+    "supervisor_not_found": "Supervisor not found."
   }
 }
