@@ -18,7 +18,7 @@ function CheckInScreen() {
       const data = await recognizeFace(photo.uri);
 
       if (data.matchFound) {
-        if (user.role === "supervisor") navigation.navigate("Home", { faceData: { ...data.matched_worker, image: photo.uri } });
+        if (user.role === "supervisor") navigation.navigate("TaskCheck", { faceData: { ...data.matched_worker, image: photo.uri } });
 
         const send = {
           ...data.matched_worker,
