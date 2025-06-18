@@ -1,21 +1,25 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import useCheckInfo from "../services/UserContext";
+import useAttendanceAndChecks from "../services/useAttendanceChecks";
+import { all } from "axios";
 
 function SpecialReEntryScreen() {
   const navigation = useNavigation();
   const { t } = useTranslation();
   const { user, loggedIn } = useCheckInfo();
 
-  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  const BACKEND_API_URL =
+    "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const [SpecialReEntries, setSpecialReEntries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { SpecialReEntry } = useAttendanceAndChecks();
 
-  const fetchAttendance = async () => {
+  const fetchEntries = async () => {
     // console.log(user);
     setLoading(true);
     setErrorMessage("");
@@ -34,7 +38,7 @@ function SpecialReEntryScreen() {
       }
 
       const jsonSpecialReEntries = await peopleResponse.json();
-      setSpecialReEntries(jsonSpecialReEntries.data || []);
+      setSpecialReEntries(jsonSpecialReEntries.special_re_entries || []);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -42,8 +46,26 @@ function SpecialReEntryScreen() {
     }
   };
 
+  const HandleEntry = async (id, allowed) => {
+    ToSend = {
+      attendance_subject_id: id,
+      attendance_is_special_re_entry: allowed,
+      attendance_is_unauthorized: allowed ? false : true,
+      attendance_is_approved_by_supervisor: allowed,
+      attendance_is_entry_permitted: allowed,
+    };
+
+    try {
+      const specialReEntry = await SpecialReEntry(ToSend);
+      Alert.alert(t(specialReEntry));
+    } catch (error) {
+      console.error("Error handling entry:", error);
+      setErrorMessage(t("errors.checkinFailure"));
+    }
+  };
+
   useEffect(() => {
-    fetchAttendance();
+    fetchEntries();
   }, []);
 
   return (
@@ -70,6 +92,25 @@ function SpecialReEntryScreen() {
                 <Text style={styles.name}>
                   {entry.attendance_subject?.person_name}
                 </Text>
+                <View style={styles.actions}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      HandleEntry(entry.attendance_subject_id, true)
+                    }
+                    style={[styles.button, styles.acceptButton]}
+                  >
+                    <Text style={styles.buttonText}>{t("ui.accept")}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      HandleEntry(entry.attendance_subject_id, false)
+                    }
+                    style={[styles.button, styles.declineButton]}
+                  >
+                    <Text style={styles.buttonText}>{t("ui.decline")}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ))
           ) : (
@@ -110,76 +151,62 @@ function SpecialReEntryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#f4f4f4",
     padding: 15,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "700",
-    color: "#333",
+    color: "#222",
     marginBottom: 20,
     textAlign: "center",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#e0e0e0",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
   },
   headerText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#555",
+    color: "#444",
     flex: 1,
-    textAlign: "left",
   },
   item: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 12,
+    marginVertical: 8,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    justifyContent: "space-between",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 3,
+    shadowRadius: 4,
+    elevation: 2,
   },
   name: {
     fontSize: 16,
-    fontWeight: "600",
     color: "#333",
-    flex: 2,
+    fontWeight: "600",
+    flex: 1.5,
   },
-  status: {
-    fontSize: 15,
-    color: "#666",
-    flex: 1,
-    textAlign: "center",
-  },
-  buttonContainer: {
+  actions: {
     flexDirection: "row",
-    flex: 2,
-    justifyContent: "flex-end",
     gap: 10,
+    flex: 1,
+    justifyContent: "flex-end",
   },
   button: {
-    paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     borderRadius: 20,
+    minWidth: 70,
     alignItems: "center",
     justifyContent: "center",
-    minWidth: 80,
   },
   acceptButton: {
     backgroundColor: "#4CAF50",
@@ -189,8 +216,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
+    fontSize: 13,
     fontWeight: "bold",
-    fontSize: 14,
   },
   loading: {
     fontSize: 16,
@@ -211,24 +238,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 30,
   },
-  link: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: "#007AFF",
-    width: "80%",
-    alignItems: "center",
-    borderRadius: 10,
-    marginVertical: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  text: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
 });
+
 export default SpecialReEntryScreen;
