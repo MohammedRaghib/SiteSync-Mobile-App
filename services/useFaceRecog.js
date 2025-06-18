@@ -1,109 +1,53 @@
 import { useState } from "react";
 import { Alert } from "react-native";
 
+const BACKEND_API_URL = "http://127.0.0.1:9000/api/";
+
+
 const useFaceRecognition = () => {
     const [matchedWorker, setMatchedWorker] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const FACE_API_KEY = "YOUR_AZURE_FACE_API_KEY";
-    const FACE_API_ENDPOINT = "https://<your-resource-name>.cognitiveservices.azure.com";
-    const PERSON_GROUP_ID = "your-attendance-system"; 
+    const convertImageUriToBlob = async (imageUri) => {
+        const response = await fetch(imageUri);
+        return response.blob();
+    };
 
     const recognizeFace = async (imageUri) => {
         try {
             setLoading(true);
             setMatchedWorker(null);
 
-            const response = await fetch(imageUri);
-            const imageBlob = await response.blob();
+            const imageBlob = await convertImageUriToBlob(imageUri);
+            const formData = new FormData();
+            formData.append("image", imageBlob);
 
-            const detectResponse = await fetch(
-                `${FACE_API_ENDPOINT}/face/v1.0/detect?returnFaceId=true`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Ocp-Apim-Subscription-Key": FACE_API_KEY,
-                        "Content-Type": "application/octet-stream",
-                    },
-                    body: imageBlob,
-                }
-            );
+            const response = await fetch(`${BACKEND_API_URL}check_face/`, {
+                method: "POST",
+                body: formData,
+            });
 
-            if (!detectResponse.ok) {
-                throw new Error(`Face detection failed: ${await detectResponse.text()}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`Recognition failed: ${response.statusText}`);
             }
-
-            const faces = await detectResponse.json();
-            if (faces.length === 0) {
-                Alert.alert("No faces detected in the image");
-                return { matchFound: false };
-            }
-
-            const identifyResponse = await fetch(
-                `${FACE_API_ENDPOINT}/face/v1.0/identify`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Ocp-Apim-Subscription-Key": FACE_API_KEY,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        faceIds: [faces[0].faceId],
-                        personGroupId: PERSON_GROUP_ID,
-                        maxNumOfCandidatesReturned: 1,
-                        confidenceThreshold: 0.5,
-                    }),
-                }
-            );
-
-            if (!identifyResponse.ok) {
-                throw new Error(`Identification failed: ${await identifyResponse.text()}`);
-            }
-
-            const identificationResults = await identifyResponse.json();
-            if (identificationResults[0].candidates.length === 0) {
-                Alert.alert("No matching worker found");
-                return { matchFound: false };
-            }
-
-            const personId = identificationResults[0].candidates[0].personId;
-            const personResponse = await fetch(
-                `${FACE_API_ENDPOINT}/face/v1.0/persongroups/${PERSON_GROUP_ID}/persons/${personId}`,
-                {
-                    headers: {
-                        "Ocp-Apim-Subscription-Key": FACE_API_KEY,
-                    },
-                }
-            );
-
-            const personData = await personResponse.json();
-
-            const formattedResponse = {
-                matchFound: true,
-                matched_worker: {
-                    person_id: personId,
-                    name: personData.name,
-                    face_encoding: null,
-                    ...(personData.userData ? JSON.parse(personData.userData) : {}),
-                },
-            };
-
-            setMatchedWorker(formattedResponse.matched_worker);
-            return formattedResponse;
             
+            if (data.matchFound) {
+                setMatchedWorker(data.matched_worker);
+            } else {
+                Alert.alert("No match found!");
+            }
+
+            return data;
         } catch (error) {
-            console.error("Face recognition error:", error);
-            Alert.alert("Error", error.message);
-            return { 
-                matchFound: false, 
-                error: error.message 
-            };
+            return { matchFound: false, error: error.message };
         } finally {
             setLoading(false);
         }
     };
 
-    return { matchedWorker, recognizeFace, loading };
+    return { matchedWorker, recognizeFace, loading, convertImageUriToBlob };
 };
 
 export default useFaceRecognition;
