@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import useCheckInfo from "../services/UserContext";
 
 const DashboardScreen = () => {
@@ -9,8 +9,8 @@ const DashboardScreen = () => {
   const { t } = useTranslation();
   const { user, loggedIn } = useCheckInfo();
 
-  const BACKEND_API_URL =
-    "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
+  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const [AbsenteesView, setAbsenteesView] = useState(false);
   const [AttendanceData, setAttendanceData] = useState([]);
@@ -19,27 +19,18 @@ const DashboardScreen = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const fetchAttendance = async () => {
-    // console.log(user);
     setLoading(true);
     setErrorMessage("");
-
     try {
-      const peopleResponse = await fetch(
-        `${BACKEND_API_URL}supervisor_dashboard/`,
-        {
-          method: "GET",
-        }
-      );
-
-      if (!peopleResponse.ok) {
-        setErrorMessage(t("errors.fetchError"));
-        throw new Error(t("errors.fetchError"));
+      const response = await fetch(`${BACKEND_API_URL}supervisor_dashboard?supervisor_id=${user?.id}`);
+      if (!response.ok) {
+        const jsonError = await response.json();
+        throw new Error(t("errors." + jsonError.error_type || "fetchError"));
       }
-
-      const jsonAttendanceData = await peopleResponse.json();
-      setAttendanceData(jsonAttendanceData.data || []);
+      const json = await response.json();
+      setAttendanceData(json.data || []);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -48,28 +39,17 @@ const DashboardScreen = () => {
   const fetchAbsentees = async () => {
     setLoading(true);
     setErrorMessage("");
-
     try {
-      const absenteesResponse = await fetch(
-        `${BACKEND_API_URL}project_absentees?supervisor_id=${user?.id}`,
-        {
-          method: "GET",
-        }
-      );
+      const response = await fetch(`${BACKEND_API_URL}project_absentees?supervisor_id=${user?.id}`);
 
-      if (!absenteesResponse.ok) {
-        console.error(
-          "Error fetching absentees data:",
-          absenteesResponse.statusText
-        );
-        setErrorMessage(t("errors.fetchError"));
-        throw new Error(t("errors.fetchError"));
+      if (!response.ok) {
+        const jsonError = await response.json();
+        throw new Error(t("errors." + jsonError.error_type || "fetchError"));
       }
-
-      const jsonAbsenteesData = await absenteesResponse.json();
-      setAbsenteesData(jsonAbsenteesData.project_absentees || []);
+      const json = await response.json();
+      setAbsenteesData(json.project_absentees || []);
     } catch (error) {
-      console.error("Error fetching absentees data:", error);
+      setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -81,34 +61,29 @@ const DashboardScreen = () => {
 
   return (
     <View style={styles.container}>
-      <>
-        {loggedIn && user?.role === "supervisor" && (
-          <>
-            {!AbsenteesView ? (
-              <TouchableOpacity
-                style={styles.absenteesLink}
-                onPress={() => {
+      {loggedIn && user?.role === "supervisor" && (
+        <>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              style={styles.absenteesLink}
+              onPress={() => {
+                if (AbsenteesView) {
+                  setAbsenteesView(false);
+                } else {
                   setAbsenteesView(true);
                   fetchAbsentees();
-                }}
-              >
-                <Text style={styles.title}>{t("ui.absentees")}</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={styles.absenteesLink}
-                onPress={() => setAbsenteesView(false)}
-              >
-                <Text style={styles.title}>{t("ui.back")}</Text>
-              </TouchableOpacity>
-            )}
-            <Text style={styles.title}>{t("ui.dashboard")}</Text>
+                }
+              }}
+            >
+              <Text style={styles.linkText}>
+                {AbsenteesView ? t("ui.back") : t("ui.absentees")}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-            <View style={styles.header}>
-              <Text style={styles.headerText}>{t("ui.name")}</Text>
-              <Text style={styles.headerText}>{t("ui.status")}</Text>
-            </View>
+          <Text style={styles.title}>{t("ui.dashboard")}</Text>
 
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
             {loading ? (
               <Text style={styles.loading}>{t("ui.loading")}</Text>
             ) : errorMessage ? (
@@ -130,16 +105,10 @@ const DashboardScreen = () => {
                   style={styles.item}
                 >
                   <Text style={styles.name}>
-                    {attendance.attendance_subject?.person_name}
+                    {t("ui.name")} - {attendance.attendance_subject?.person_name}
                   </Text>
                   <Text style={styles.status}>
-                    {attendance.attendance_is_check_in
-                      ? t("attendance.checkIn")
-                      : t("attendance.checkOut")}{" "}
-                    -{" "}
-                    {new Date(
-                      attendance.attendance_timestamp
-                    ).toLocaleTimeString([], {
+                    {t("ui.checkedinby")} {attendance.attendance_is_supervisor_checkin ? t("ui.supervisor") : t("ui.guard")} - {new Date(attendance.attendance_timestamp).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                       hour12: true,
@@ -150,33 +119,23 @@ const DashboardScreen = () => {
             ) : (
               <Text style={styles.noData}>{t("ui.noData")}</Text>
             )}
-          </>
-        )}
-      </>
+          </ScrollView>
+        </>
+      )}
 
       {loggedIn && user?.role === "guard" && (
         <>
-          <TouchableOpacity
-            style={styles.link}
-            onPress={() => navigation.navigate("CheckIn")}
-          >
+          <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("CheckIn")}>
             <Text style={styles.text}>{t("attendance.checkOut")}</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.link}
-            onPress={() => navigation.navigate("CheckIn")}
-          >
+          <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("CheckIn")}>
             <Text style={styles.text}>{t("attendance.checkIn")}</Text>
           </TouchableOpacity>
         </>
       )}
 
       {!loggedIn && (
-        <TouchableOpacity
-          style={styles.link}
-          onPress={() => navigation.navigate("Login")}
-        >
+        <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("Login")}>
           <Text style={styles.text}>{t("ui.login")}</Text>
         </TouchableOpacity>
       )}
@@ -189,33 +148,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f4f4f4",
     padding: 20,
-    alignItems: "center",
+  },
+  scrollContainer: {
+    paddingBottom: 100,
+  },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginVertical: 20,
     textAlign: "center",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    width: "100%",
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
   item: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    width: "100%",
+    backgroundColor: "#fff",
+    padding: 12,
+    marginVertical: 8,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   name: {
     fontSize: 16,
@@ -224,35 +180,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#007AFF",
+    marginTop: 4,
   },
   loading: {
     fontSize: 16,
     fontStyle: "italic",
     color: "#666",
+    textAlign: "center",
   },
   error: {
     fontSize: 16,
     color: "red",
+    textAlign: "center",
     marginVertical: 10,
   },
   noData: {
     fontSize: 16,
     fontStyle: "italic",
     color: "#666",
+    textAlign: "center",
   },
   link: {
     paddingVertical: 15,
     paddingHorizontal: 20,
     backgroundColor: "#007AFF",
-    width: "80%",
     alignItems: "center",
     borderRadius: 10,
     marginVertical: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
   },
   text: {
     color: "white",
@@ -260,14 +214,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   absenteesLink: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
     backgroundColor: "#007AFF",
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 20,
-    marginHorizontal: 5,
+    alignSelf: "flex-end",
+  },
+  linkText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
