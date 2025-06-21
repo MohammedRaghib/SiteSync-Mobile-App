@@ -1,18 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Alert, ScrollView } from "react-native";
 import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
-// import { all } from "axios";
 
 function SpecialReEntryScreen() {
   const navigation = useNavigation();
   const { t } = useTranslation();
   const { user, loggedIn } = useCheckInfo();
 
-  const BACKEND_API_URL =
-    "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
+  // const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const [SpecialReEntries, setSpecialReEntries] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,27 +19,21 @@ function SpecialReEntryScreen() {
   const { SpecialReEntry } = useAttendanceAndChecks();
 
   const fetchEntries = async () => {
-    // console.log(user);
     setLoading(true);
     setErrorMessage("");
-
     try {
-      const peopleResponse = await fetch(
-        `${BACKEND_API_URL}get_special_re_entries/`,
-        {
-          method: "GET",
-        }
-      );
+      const response = await fetch(`${BACKEND_API_URL}get_special_re_entries/`);
 
-      if (!peopleResponse.ok) {
-        setErrorMessage(t("errors.fetchError"));
-        throw new Error(t("errors.fetchError"));
+      if (!response.ok) {
+        const jsonError = await response.json();
+        throw new Error(t("errors." + jsonError.error_type || "fetchError"));
       }
 
-      const jsonSpecialReEntries = await peopleResponse.json();
-      setSpecialReEntries(jsonSpecialReEntries.special_re_entries || []);
+      const json = await response.json();
+      setSpecialReEntries(json.special_re_entries || []);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -50,14 +43,15 @@ function SpecialReEntryScreen() {
     const ToSend = {
       attendance_subject_id: id,
       attendance_is_special_re_entry: allowed,
-      attendance_is_unauthorized: allowed ? false : true,
+      attendance_is_unauthorized: !allowed,
       attendance_is_approved_by_supervisor: allowed,
       attendance_is_entry_permitted: allowed,
     };
 
     try {
-      const specialReEntry = await SpecialReEntry(ToSend);
-      Alert.alert(t(specialReEntry));
+      const response = await SpecialReEntry(ToSend);
+      Alert.alert(t(response));
+      fetchEntries();
     } catch (error) {
       console.error("Error handling entry:", error);
       setErrorMessage(t("errors.checkinFailure"));
@@ -74,45 +68,42 @@ function SpecialReEntryScreen() {
         <>
           <Text style={styles.title}>{t("ui.specialReEntry")}</Text>
 
-          <View style={styles.header}>
-            <Text style={styles.headerText}>{t("ui.name")}</Text>
-            <Text style={styles.headerText}>{t("ui.actions")}</Text>
-          </View>
-
           {loading ? (
             <Text style={styles.loading}>{t("ui.loading")}</Text>
           ) : errorMessage ? (
             <Text style={styles.error}>{errorMessage}</Text>
           ) : SpecialReEntries.length > 0 ? (
-            SpecialReEntries.map((entry) => (
-              <View
-                key={entry.attendance_subject?.person_id}
-                style={styles.item}
-              >
-                <Text style={styles.name}>
-                  {entry.attendance_subject?.person_name}
-                </Text>
-                <View style={styles.actions}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      HandleEntry(entry.attendance_subject_id, true)
-                    }
-                    style={[styles.button, styles.acceptButton]}
-                  >
-                    <Text style={styles.buttonText}>{t("ui.accept")}</Text>
-                  </TouchableOpacity>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+              {SpecialReEntries.map((entry) => (
+                <View
+                  key={entry.attendance_subject?.person_id}
+                  style={styles.item}
+                >
+                  <Text style={styles.name}>
+                    {entry.attendance_subject?.person_name}
+                  </Text>
+                  <View style={styles.actions}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        HandleEntry(entry.attendance_subject_id, true)
+                      }
+                      style={[styles.button, styles.acceptButton]}
+                    >
+                      <Text style={styles.buttonText}>{t("ui.accept")}</Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity
-                    onPress={() =>
-                      HandleEntry(entry.attendance_subject_id, false)
-                    }
-                    style={[styles.button, styles.declineButton]}
-                  >
-                    <Text style={styles.buttonText}>{t("ui.decline")}</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() =>
+                        HandleEntry(entry.attendance_subject_id, false)
+                      }
+                      style={[styles.button, styles.declineButton]}
+                    >
+                      <Text style={styles.buttonText}>{t("ui.decline")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))
+              ))}
+            </ScrollView>
           ) : (
             <Text style={styles.noData}>{t("ui.noData")}</Text>
           )}
@@ -127,7 +118,6 @@ function SpecialReEntryScreen() {
           >
             <Text style={styles.text}>{t("attendance.checkOut")}</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
@@ -148,11 +138,15 @@ function SpecialReEntryScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f4f4f4",
     padding: 15,
+  },
+  scrollContent: {
+    paddingBottom: 100,
   },
   title: {
     fontSize: 26,
@@ -160,19 +154,6 @@ const styles = StyleSheet.create({
     color: "#222",
     marginBottom: 20,
     textAlign: "center",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#444",
-    flex: 1,
   },
   item: {
     backgroundColor: "#ffffff",
@@ -237,6 +218,19 @@ const styles = StyleSheet.create({
     color: "#888",
     textAlign: "center",
     marginTop: 30,
+  },
+  link: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: "#007AFF",
+    alignItems: "center",
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  text: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 

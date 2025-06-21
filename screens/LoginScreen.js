@@ -20,8 +20,8 @@ const LoginScreen = () => {
   const { setUser, loggedIn, setLoggedIn, user } = useCheckInfo();
   const { t } = useTranslation();
 
-  // const BACKEND_API_URL = "http://192.168.1.101:8000/api/";
-  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
+  // const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -54,6 +54,7 @@ const LoginScreen = () => {
 
       setErrorMessage("");
       const userData = await userResponse.json();
+      // console.log("User Data:", userData);
       const { person_id, role_name } = userData;
 
       const newUser = {
@@ -123,7 +124,7 @@ const LoginScreen = () => {
             value={password}
             onChangeText={setPassword}
           />
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
             <Text style={styles.buttonText}>
               {loading ? t("ui.loading") : t("auth.login")}
             </Text>
