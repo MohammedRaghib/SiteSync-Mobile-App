@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Alert } from "react-native";
 
-const BACKEND_API_URL = "http://127.0.0.1:9000/api/";
+// const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
+const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
 
 const useFaceRecognition = () => {
@@ -32,7 +33,7 @@ const useFaceRecognition = () => {
             if (!response.ok) {
                 throw new Error(`Recognition failed: ${response.statusText}`);
             }
-            
+
             if (data.matchFound) {
                 setMatchedWorker(data.matched_worker);
             } else {
