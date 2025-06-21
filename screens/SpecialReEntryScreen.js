@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
-import { all } from "axios";
+// import { all } from "axios";
 
 function SpecialReEntryScreen() {
   const navigation = useNavigation();
@@ -47,7 +47,7 @@ function SpecialReEntryScreen() {
   };
 
   const HandleEntry = async (id, allowed) => {
-    ToSend = {
+    const ToSend = {
       attendance_subject_id: id,
       attendance_is_special_re_entry: allowed,
       attendance_is_unauthorized: allowed ? false : true,
