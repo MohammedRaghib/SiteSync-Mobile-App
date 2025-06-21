@@ -11,12 +11,16 @@ import {
 } from "react-native";
 import useCheckInfo from "../services/UserContext";
 import SwitchLanguage from "../Language/SwitchLanguage";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+// import { Platform } from "react-native";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const { setUser, loggedIn, setLoggedIn, user } = useCheckInfo();
   const { t } = useTranslation();
 
+  // const BACKEND_API_URL = "http://192.168.1.101:8000/api/";
   const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const [username, setUsername] = useState("");
@@ -32,9 +36,11 @@ const LoginScreen = () => {
     setErrorMessage("");
     setLoading(true);
     try {
+      const expoToken = await getExpoToken();
       const formData = new FormData();
       formData.append("username", username.trim());
       formData.append("password", password);
+      formData.append("expo_token", expoToken);
 
       const userResponse = await fetch(`${BACKEND_API_URL}login/`, {
         method: "POST",
@@ -42,11 +48,8 @@ const LoginScreen = () => {
       });
 
       if (!userResponse.ok) {
-        const errorText = await userResponse.text();
-        console.error("❌ Login failed");
-        console.error("Status Code:", userResponse.status);
-        console.error("Response Body:", errorText);
-        throw new Error(`Login failed: ${userResponse.status}`);
+        const errorText = await userResponse.json();
+        throw new Error(t("errors." + errorText.error_type || "errorLoginFailed"));
       }
 
       setErrorMessage("");
@@ -73,6 +76,33 @@ const LoginScreen = () => {
       setLoading(false);
     }
   };
+
+  async function getExpoToken() {
+    if (!Device.isDevice) {
+      console.warn("Must use physical device for push notifications");
+      return null;
+    }
+
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      console.warn("Failed to get push token permission!");
+      return null;
+    }
+
+    const tokenData = await Notifications.getExpoPushTokenAsync();
+    const expoPushToken = tokenData.data;
+
+    console.log("Expo Push Token:", expoPushToken);
+    return expoPushToken;
+  }
 
   return (
     <>
@@ -114,6 +144,21 @@ const LoginScreen = () => {
         </View>
       )}
       <SwitchLanguage />
+      {/* <TouchableOpacity
+        style={styles.button}
+        onPress={async () => {
+          const token = await getExpoPushToken();
+          if (token) {
+            Alert.alert(t("successToken"), token);
+          } else {
+            Alert.alert(t("errorToken"));
+          }
+        }}
+      >
+        <Text style={styles.buttonText}>
+          {Platform.OS === "web" ? t("ui.getTokenWeb") : t("ui.getToken")}
+        </Text>
+      </TouchableOpacity> */}
     </>
   );
 };

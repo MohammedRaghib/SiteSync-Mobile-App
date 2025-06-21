@@ -66,6 +66,11 @@
     "project_not_found": "Project not found.",
     "missing_parameters": "Missing parameters in the request.",
     "supervisor_no_project": "Supervisor does not have a project assigned.",
-    "supervisor_not_found": "Supervisor not found."
+    "supervisor_not_found": "Supervisor not found.",
+    "supervisor_contact_error": "Unable to contact supervisor, contact supervisor manually.",
+    "guard_contact_error": "Unable to contact gurad, contact guard manually.",
+    "guard_entry_not_found": "Last entry request not found.",
+    "guard_not_found": "No monitor found to alert, please inform manually.",
+    "expo_token_required": "Can not identify device. You will be unable to receive notifications."
   }
 }
