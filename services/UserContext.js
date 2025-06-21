@@ -10,8 +10,9 @@ export function CheckInfoProvider({ children }) {
     access: "",
     refresh: "",
   });
-  const BACKEND_API_URL =
-    "https://django.angelightrading.com/home/angeligh/djangoapps/api/";
+
+  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
+  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const hasAccess = ({ requiresLogin = true, allowedRoles = [] }) => {
     if (requiresLogin && !loggedIn) return false;

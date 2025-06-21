@@ -20,8 +20,8 @@ const LoginScreen = () => {
   const { setUser, loggedIn, setLoggedIn, user } = useCheckInfo();
   const { t } = useTranslation();
 
-  const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
-  // const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
+  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

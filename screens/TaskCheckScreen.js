@@ -31,7 +31,8 @@ function TaskCheckScreen() {
     allEquipmentReturned: false,
   });
 
-  const BACKEND_API_URL = "http://127.0.0.1:8000/api/";
+  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
+  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
   const fetchTasks = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));

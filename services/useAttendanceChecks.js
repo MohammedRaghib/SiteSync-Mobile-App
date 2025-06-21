@@ -1,8 +1,8 @@
 import useCheckInfo from "./UserContext";
 import * as Location from "expo-location";
 
-const BACKEND_API_URL =
-  "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
+  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
 
 const useAttendanceAndChecks = () => {
   const { user } = useCheckInfo();
