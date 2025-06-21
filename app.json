@@ -2,6 +2,7 @@
   "expo": {
     "name": "SiteSync",
     "slug": "SiteSync",
+    "owner": "mohammedraghib",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,14 +23,14 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.hussein_lightwalla.SiteSync"
+      "package": "com.sitesync.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "76f0bffb-8783-45f7-ad31-0f880435f52c"
+        "projectId": "1ae24ee1-5e5e-4cf6-a7d2-a7a895ad62c8"
       }
     }
   }
