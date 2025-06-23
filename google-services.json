@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:855989224635:android:a4de3425d7e0223aa2d59e",
+        "mobilesdk_app_id": "1:855989224635:android:3fac0e654685f294a2d59e",
         "android_client_info": {
-          "package_name": "com.sitesync.app"
+          "package_name": "com.sitesynconstruction.app"
         }
       },
       "oauth_client": [],

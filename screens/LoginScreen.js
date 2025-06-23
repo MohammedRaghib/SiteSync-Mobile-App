@@ -98,7 +98,10 @@ const LoginScreen = () => {
       return null;
     }
 
-    const tokenData = await Notifications.getExpoPushTokenAsync();
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId: "site-sync-f617e"
+    });
+
     const expoPushToken = tokenData.data;
 
     console.log("Expo Push Token:", expoPushToken);
