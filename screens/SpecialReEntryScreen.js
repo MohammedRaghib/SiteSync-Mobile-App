@@ -8,10 +8,9 @@ import useAttendanceAndChecks from "../services/useAttendanceChecks";
 function SpecialReEntryScreen() {
   const navigation = useNavigation();
   const { t } = useTranslation();
-  const { user, loggedIn } = useCheckInfo();
+  const { user, loggedIn, BACKEND_API_URLS } = useCheckInfo();
 
-  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
-  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
   const [SpecialReEntries, setSpecialReEntries] = useState([]);
   const [loading, setLoading] = useState(false);

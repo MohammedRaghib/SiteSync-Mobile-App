@@ -9,7 +9,7 @@ import useFaceRecognition from "../services/useFaceRecog";
 function CheckInScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
-  const { user, loggedIn } = useCheckInfo();
+  const { user } = useCheckInfo();
   const { CheckOutAttendance } = useAttendanceAndChecks();
   const { recognizeFace } = useFaceRecognition();
 

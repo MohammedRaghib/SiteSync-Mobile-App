@@ -17,11 +17,10 @@ import * as Device from "expo-device";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const { setUser, loggedIn, setLoggedIn, user } = useCheckInfo();
+  const { setUser, loggedIn, setLoggedIn, BACKEND_API_URLS } = useCheckInfo();
   const { t } = useTranslation();
 
-  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
-  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

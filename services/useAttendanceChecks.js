@@ -1,11 +1,9 @@
 import useCheckInfo from "./UserContext";
 import * as Location from "expo-location";
 
-  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
-  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
-
 const useAttendanceAndChecks = () => {
-  const { user } = useCheckInfo();
+  const { user, BACKEND_API_URLS } = useCheckInfo();
+  const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
   const getAttendanceInfo = async () => {
     try {
@@ -40,8 +38,7 @@ const useAttendanceAndChecks = () => {
   ) => {
     try {
       const attendanceInfo = await getAttendanceInfo();
-      if (!attendanceInfo)
-        throw new Error("Failed to retrieve attendance info");
+      if (!attendanceInfo) throw new Error(t("errors.TimeAndLocationError"));
 
       let base64Image = null;
 
