@@ -2,14 +2,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { Alert, Text, View } from "react-native";
 import CameraLocationComponent from "../components/CameraLocationComponent";
-import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
 import useFaceRecognition from "../services/useFaceRecog";
 
 function CheckInScreen() {
   const { t } = useTranslation();
-  const navigation = useNavigation();
-  const { user, loggedIn } = useCheckInfo();
   const { CheckInAttendance } = useAttendanceAndChecks();
   const { recognizeFace } = useFaceRecognition();
 

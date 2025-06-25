@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Alert } from "react-native";
-
-// const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
-const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
-
+import useCheckInfo from "./UserContext";
 
 const useFaceRecognition = () => {
     const [matchedWorker, setMatchedWorker] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const { BACKEND_API_URLS } = useCheckInfo();
+    const BACKEND_API_URL = BACKEND_API_URLS.backend2;
 
     const convertImageUriToBlob = async (imageUri) => {
         const response = await fetch(imageUri);

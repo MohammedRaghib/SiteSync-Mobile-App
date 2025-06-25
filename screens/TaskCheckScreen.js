@@ -19,7 +19,7 @@ function TaskCheckScreen() {
   const { t } = useTranslation();
   const { faceData } = route.params || {};
   const navigation = useNavigation();
-  const { user, loggedIn } = useCheckInfo();
+  const { user, loggedIn, BACKEND_API_URLS } = useCheckInfo();
   const { CheckOutAttendance } = useAttendanceAndChecks();
 
   const [state, setState] = useState({
@@ -31,8 +31,7 @@ function TaskCheckScreen() {
     allEquipmentReturned: false,
   });
 
-  // const BACKEND_API_URL = "http://192.168.100.65:8000/api/";
-  const BACKEND_API_URL = "https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/";
+  const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
   const fetchTasks = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
