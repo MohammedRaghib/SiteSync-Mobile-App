@@ -13,7 +13,6 @@ import useCheckInfo from "../services/UserContext";
 import SwitchLanguage from "../Language/SwitchLanguage";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
-// import { Platform } from "react-native";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -53,7 +52,6 @@ const LoginScreen = () => {
 
       setErrorMessage("");
       const userData = await userResponse.json();
-      // console.log("User Data:", userData);
       const { person_id, role_name } = userData;
 
       const newUser = {
@@ -64,8 +62,6 @@ const LoginScreen = () => {
       setUser((prevUser) => ({
         ...prevUser,
         ...newUser,
-        // refresh: tokenData.refresh,
-        // access: tokenData.access,
       }));
 
       navigation.navigate("Home");
@@ -79,7 +75,6 @@ const LoginScreen = () => {
 
   async function getExpoToken() {
     if (!Device.isDevice) {
-      console.warn("Must use physical device for push notifications");
       return null;
     }
 
@@ -93,15 +88,18 @@ const LoginScreen = () => {
     }
 
     if (finalStatus !== "granted") {
-      console.warn("Failed to get push token permission!");
       return null;
     }
 
-    const tokenData = await Notifications.getExpoPushTokenAsync();
+    try {
+      const tokenData = await Notifications.getExpoPushTokenAsync();
+    } catch (error) {
+      Alert.alert(t("errors.expo_token_required"));
+      return null;
+    }
 
     const expoPushToken = tokenData.data;
 
-    console.log("Expo Push Token:", expoPushToken);
     return expoPushToken;
   }
 
