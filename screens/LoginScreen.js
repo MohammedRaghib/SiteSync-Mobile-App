@@ -34,7 +34,7 @@ const LoginScreen = () => {
     setErrorMessage("");
     setLoading(true);
     try {
-      const expoToken = await getExpoToken();
+      const expoToken = await getExpoPushToken();
       const formData = new FormData();
       formData.append("username", username.trim());
       formData.append("password", password);
@@ -73,16 +73,13 @@ const LoginScreen = () => {
     }
   };
 
-  async function getExpoToken() {
-    if (!Device.isDevice) {
-      return null;
-    }
+  const getExpoPushToken = async () => {
+    let finalStatus;
 
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    finalStatus = existingStatus;
 
-    if (existingStatus !== "granted") {
+    if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
@@ -93,15 +90,14 @@ const LoginScreen = () => {
 
     try {
       const tokenData = await Notifications.getExpoPushTokenAsync();
+      const expoPushToken = tokenData.data;
+      return expoPushToken;
     } catch (error) {
       Alert.alert(t("errors.expo_token_required"));
       return null;
     }
+  };
 
-    const expoPushToken = tokenData.data;
-
-    return expoPushToken;
-  }
 
   return (
     <>

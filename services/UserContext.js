@@ -12,7 +12,7 @@ export function CheckInfoProvider({ children }) {
   });
   const [BACKEND_API_URLS, setBACKEND_API_URLS] = useState({
     backend1: 'https://sitesync.angelightrading.com/home/angeligh/sitesyncdjango/api/',
-    backend2: ''
+    backend2: 'https://cry-tree-trinidad-heater.trycloudflare.com/api/'
   });
   const { t } = useTranslation();
 
@@ -67,7 +67,7 @@ export function CheckInfoProvider({ children }) {
         backend1: data.backend1,
         backend2: data.backend2
       }));
-
+      Alert.alert(data.backend2);
     } catch (e) {
       Alert.alert(e.message);
     }
