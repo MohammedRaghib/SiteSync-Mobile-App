@@ -14,7 +14,7 @@ function CheckInScreen() {
     try {
       const data = await recognizeFace(photo.uri);
 
-      if (data.success) {
+      if (data.matchFound) {
         const send = {
           ...data.matched_worker,
           image: photo.uri,
