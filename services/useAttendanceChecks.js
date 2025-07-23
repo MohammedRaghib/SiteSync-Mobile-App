@@ -11,7 +11,7 @@ const useAttendanceAndChecks = () => {
 
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        //Debug console.error("❌ Location permission denied");
+        console.error("❌ Location permission denied");
         throw new Error("Location permission denied");
       }
 
@@ -19,7 +19,7 @@ const useAttendanceAndChecks = () => {
         mayUseLastKnownLocation: true,
       });
 
-      //Debug console.log("📍 Location acquired:", coords);
+      console.log("📍 Location acquired:", coords);
 
       return {
         timestamp,
@@ -29,7 +29,7 @@ const useAttendanceAndChecks = () => {
         },
       };
     } catch (error) {
-      //Debug console.error("❌ Failed to get attendance info:", error.message);
+      console.error("❌ Failed to get attendance info:", error.message);
       return null;
     }
   };
@@ -41,14 +41,14 @@ const useAttendanceAndChecks = () => {
     additionalFields = {}
   ) => {
     try {
-      //Debug console.log("🔄 Starting attendance submission...");
+      console.log("🔄 Starting attendance submission...");
       const attendanceInfo = await getAttendanceInfo();
       if (!attendanceInfo) throw new Error("errors.TimeAndLocationError");
 
       let base64Image = null;
 
       if (faceData?.image) {
-        //Debug console.log("🖼️ Converting image to base64...");
+        console.log("🖼️ Converting image to base64...");
         base64Image = await fetch(faceData?.image)
           .then((res) => res.blob())
           .then(
@@ -75,9 +75,8 @@ const useAttendanceAndChecks = () => {
         ...additionalFields,
       };
 
-      //Debug console.log("📤 Payload ready to send:", payload);
-      //Debug console.log("📤 Payload ready to send:", payload['attendance_subject_id']);
-      //Debug console.log("🌐 Sending to endpoint:", `${BACKEND_API_URL}${endpoint}/`);
+      console.log("📤 Payload ready to send:", payload['attendance_subject_id']);
+      console.log("🌐 Sending to endpoint:", `${BACKEND_API_URL}${endpoint}/`);
 
       const response = await fetch(`${BACKEND_API_URL}${endpoint}/`, {
         method: "POST",
@@ -87,29 +86,29 @@ const useAttendanceAndChecks = () => {
         body: JSON.stringify(payload),
       });
 
-      //Debug console.log("📥 Server responded with status:", response.status);
+      console.log("📥 Server responded with status:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        //Debug console.error("❌ Server error response:", errorData);
+        console.error("❌ Server error response:", errorData);
         throw new Error("errors." + errorData.error_type);
       }
 
-      //Debug console.log("✅ Check-in success");
+      console.log("✅ Check-in success");
       return "attendance.checkinSuccess";
     } catch (error) {
-      //Debug console.error("🚨 Attendance error:", error.message);
+      console.error("🚨 Attendance error:", error.message);
       return error.message;
     }
   };
 
   const CheckInAttendance = (faceData) => {
-    //Debug console.log("➡️ Check-In initiated...");
+    console.log("➡️ Check-In initiated...");
     return sendAttendanceRequest("attendance", faceData, true);
   };
 
   const CheckOutAttendance = (faceData) => {
-    //Debug console.log("⬅️ Check-Out initiated...");
+    console.log("⬅️ Check-Out initiated...");
     return sendAttendanceRequest("attendance", faceData, false, {
       attendance_is_work_completed: faceData?.is_work_completed,
       attendance_is_incomplete_checkout: !faceData?.is_work_completed,
@@ -118,7 +117,7 @@ const useAttendanceAndChecks = () => {
   };
 
   const SpecialReEntry = (faceData) => {
-    //Debug console.log("🔁 Special Re-Entry initiated...");
+    console.log("🔁 Special Re-Entry initiated...");
     return sendAttendanceRequest("attendance", faceData, true, {
       attendance_is_entry_permitted: faceData?.is_entry_permitted,
       attendance_is_special_re_entry: true,
