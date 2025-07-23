@@ -48,7 +48,7 @@ function TaskCheckScreen() {
       setState((prev) => ({ ...prev, tasks: data.tasks || [] }));
     } catch (e) {
       setState((prev) => ({ ...prev, error: e.message }));
-      console.error("Fetch error:", e);
+      //Debug console.error("Fetch error:", e);
     } finally {
       setState((prev) => ({ ...prev, loading: false }));
     }
@@ -91,7 +91,7 @@ function TaskCheckScreen() {
       Alert.alert(success);
       navigation.goBack();
     } catch (error) {
-      console.error("Checkout submission error:", error);
+      //Debug console.error("Checkout submission error:", error);
       Alert.alert(
         t("errors.checkoutFailure"),
         error.message || t("errors.serverError")

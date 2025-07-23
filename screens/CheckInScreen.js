@@ -16,23 +16,24 @@ function CheckInScreen() {
 
       if (data.matchFound) {
         const send = {
-          ...data.matched_worker,
+          subject_id: data.matched_worker?.person_id,
           image: photo.uri,
           is_unauthorized: false,
         };
-        const checkIn = CheckInAttendance(send);
+        const checkIn = await CheckInAttendance(send);
         Alert.alert(t(checkIn));
       } else {
         const send = {
           image: photo.uri,
           is_unauthorized: true,
         };
-        const checkIn = CheckInAttendance(send);
+
+        const checkIn = await CheckInAttendance(send);
         Alert.alert(t(checkIn));
       }
     } catch (error) {
       Alert.alert(error.message);
-      console.error("Check-in process failed:", error);
+      //Debug console.error("Check-in process failed:", error);
     }
   };
 

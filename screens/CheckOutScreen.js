@@ -21,25 +21,25 @@ function CheckInScreen() {
         if (user.role === "supervisor") navigation.navigate("TaskCheck", { faceData: { ...data.matched_worker, image: photo.uri } });
 
         const send = {
-          ...data.matched_worker,
+          subject_id: data.matched_worker?.person_id,
           image: photo.uri,
           is_unauthorized: false,
           is_work_completed: data.matched_worker.is_work_completed,
           is_equipment_returned: data.matched_worker.is_equipment_returned
         };
-        const checkOut = CheckOutAttendance(send);
+        const checkOut = await CheckOutAttendance(send);
         Alert.alert(t(checkOut));
       } else {
         const send = {
           image: photo.uri,
           is_unauthorized: true
         };
-        const checkOut = CheckOutAttendance(send);
+        const checkOut = await CheckOutAttendance(send);
         Alert.alert(t(checkOut));
       }
     } catch (error) {
       Alert.alert(error.message);
-      console.error("Check-out process failed:", error);
+      //Debug console.error("Check-out process failed:", error);
     }
   };
 

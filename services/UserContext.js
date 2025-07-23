@@ -48,7 +48,7 @@ export function CheckInfoProvider({ children }) {
       }));
       return data.access;
     } catch (error) {
-      console.error("Error refreshing access token:", error);
+      //Debug console.error("Error refreshing access token:", error);
       return null;
     }
   };

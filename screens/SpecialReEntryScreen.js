@@ -31,7 +31,7 @@ function SpecialReEntryScreen() {
       const json = await response.json();
       setSpecialReEntries(json.special_re_entries || []);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      //Debug console.error("Error fetching data:", error);
       setErrorMessage(error.message);
     } finally {
       setLoading(false);
@@ -40,11 +40,11 @@ function SpecialReEntryScreen() {
 
   const HandleEntry = async (id, allowed) => {
     const ToSend = {
-      attendance_subject_id: id,
-      attendance_is_special_re_entry: allowed,
-      attendance_is_unauthorized: !allowed,
-      attendance_is_approved_by_supervisor: allowed,
-      attendance_is_entry_permitted: allowed,
+      subject_id: id,
+      is_special_re_entry: allowed,
+      is_unauthorized: !allowed,
+      is_approved_by_supervisor: allowed,
+      is_entry_permitted: allowed,
     };
 
     try {
@@ -52,7 +52,7 @@ function SpecialReEntryScreen() {
       Alert.alert(t(response));
       fetchEntries();
     } catch (error) {
-      console.error("Error handling entry:", error);
+      //Debug console.error("Error handling entry:", error);
       setErrorMessage(t("errors.checkinFailure"));
     }
   };
@@ -75,7 +75,7 @@ function SpecialReEntryScreen() {
             <ScrollView contentContainerStyle={styles.scrollContent}>
               {SpecialReEntries.map((entry) => (
                 <View
-                  key={entry.attendance_subject?.person_id}
+                  key={entry.attendance_subject?.id}
                   style={styles.item}
                 >
                   <Text style={styles.name}>
@@ -84,7 +84,7 @@ function SpecialReEntryScreen() {
                   <View style={styles.actions}>
                     <TouchableOpacity
                       onPress={() =>
-                        HandleEntry(entry.attendance_subject_id, true)
+                        HandleEntry(entry.attendance_subject?.person_id, true)
                       }
                       style={[styles.button, styles.acceptButton]}
                     >
@@ -93,7 +93,7 @@ function SpecialReEntryScreen() {
 
                     <TouchableOpacity
                       onPress={() =>
-                        HandleEntry(entry.attendance_subject_id, false)
+                        HandleEntry(entry.attendance_subject?.person_id, false)
                       }
                       style={[styles.button, styles.declineButton]}
                     >

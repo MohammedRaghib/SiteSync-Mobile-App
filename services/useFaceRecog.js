@@ -10,6 +10,8 @@ const useFaceRecognition = () => {
     const BACKEND_API_URL = BACKEND_API_URLS.backend2;
 
     const recognizeFace = async (imageUri) => {
+        //Debug console.log("📸 Starting face recognition with image URI:", imageUri);
+
         try {
             setLoading(true);
             setMatchedWorker(null);
@@ -22,47 +24,59 @@ const useFaceRecognition = () => {
             });
 
             const requestUrl = `${BACKEND_API_URL}check_face/`;
+            //Debug console.log("📤 Sending POST request to:", requestUrl);
 
             const response = await fetch(requestUrl, {
                 method: "POST",
                 body: formData,
             });
 
+            //Debug console.log("📥 Response status:", response.status, response.statusText);
+
             if (!response.ok) {
-                const errorBody = await response.text();
+                let errorBody = "Unknown error";
+                try {
+                    const errorJson = await response.json();
+                    errorBody = errorJson.detail || JSON.stringify(errorJson);
+                    //Debug console.error("❌ Server error JSON:", errorJson);
+                } catch (e) {
+                    errorBody = await response.text();
+                    //Debug console.error("❌ Server error (non-JSON):", errorBody);
+                }
                 throw new Error(`Recognition failed with status ${response.status}: ${response.statusText || 'No Status Text'}. Server response: ${errorBody}`);
             }
 
             const responseText = await response.text();
+            //Debug console.log("📄 Raw response text:", responseText);
 
             let data = {};
             try {
                 if (responseText) {
                     data = JSON.parse(responseText);
-                } else {
-                    console.warn("recognizeFace: Response body was empty, setting data to empty object.");
+                    //Debug console.log("✅ Parsed JSON:", data);
                 }
             } catch (jsonError) {
-                throw new Error(`Invalid JSON response from server: ${jsonError.message}. Response text: ${responseText.substring(0, 200)}...`);
+                //Debug console.error("❌ Failed to parse JSON. Raw text:", responseText);
+                throw new Error(`Invalid JSON response from server. Response text: ${responseText.substring(0, 200)}...`);
             }
 
-
             if (data.matchFound) {
+                //Debug console.log("👤 Match found:", data.matched_worker);
                 setMatchedWorker(data.matched_worker);
-            } else {
-                Alert.alert("No match found!");
             }
 
             return data;
         } catch (error) {
-            Alert.alert("Recognition Error", `An error occurred: ${error.message}`);
-            return { matchFound: false, error: error.message };
+            const errorMessage = typeof error.message === 'string' ? error.message : JSON.stringify(error);
+            //Debug console.error("🚨 Face recognition error:", errorMessage);
+            return { matchFound: false, error: errorMessage };
         } finally {
             setLoading(false);
+            //Debug console.log("📴 Face recognition completed.");
         }
     };
 
-    return { matchedWorker, recognizeFace, loading }; 
+    return { matchedWorker, recognizeFace, loading };
 };
 
 export default useFaceRecognition;

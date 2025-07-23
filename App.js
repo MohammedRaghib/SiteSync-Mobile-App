@@ -25,7 +25,7 @@ export default function App() {
     }
 
     const subscription = Notifications.addNotificationReceivedListener((notification) => {
-      console.log("📩 Foreground Notification:", notification);
+      //Debug console.log("📩 Foreground Notification:", notification);
     });
 
     return () => subscription.remove();

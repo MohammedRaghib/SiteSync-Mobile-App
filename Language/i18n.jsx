@@ -37,11 +37,11 @@ i18n
       escapeValue: false
     }
   })
-  .then(() => {
-    console.log(`i18n initialized with language: ${i18n.language}`);
-  })
+  // .then(() => {
+  //Debug console.log(`i18n initialized with language: ${i18n.language}`);
+  // })
   .catch((error) => {
-    console.error('Error initializing i18n:', error);
+    //Debug console.error('Error initializing i18n:', error);
   });
 
 export const changeLanguage = (lang) => {

@@ -47,11 +47,11 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
         const photo = await cameraRef.current.takePictureAsync();
         onPictureTaken(photo);
       } catch (error) {
-        console.error("Error taking picture:", error);
+        //Debug console.error("Error taking picture:", error);
         Alert.alert("An error occurred, please try again.");
       }
     } else {
-      console.log("Camera not available");
+      //Debug console.log("Camera not available");
     }
   };
 
