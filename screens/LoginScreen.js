@@ -13,6 +13,7 @@ import useCheckInfo from "../services/UserContext";
 import SwitchLanguage from "../Language/SwitchLanguage";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
+import Constants from "expo-constants";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -98,6 +99,7 @@ const LoginScreen = () => {
     }
   };
 
+  const appVersion = Constants.expoConfig.version;
 
   return (
     <>
@@ -139,21 +141,7 @@ const LoginScreen = () => {
         </View>
       )}
       <SwitchLanguage />
-      {/* <TouchableOpacity
-        style={styles.button}
-        onPress={async () => {
-          const token = await getExpoPushToken();
-          if (token) {
-            Alert.alert(t("successToken"), token);
-          } else {
-            Alert.alert(t("errorToken"));
-          }
-        }}
-      >
-        <Text style={styles.buttonText}>
-          {Platform.OS === "web" ? t("ui.getTokenWeb") : t("ui.getToken")}
-        </Text>
-      </TouchableOpacity> */}
+      <Text style={styles.versionText}>Version: {appVersion}</Text>
     </>
   );
 };
@@ -193,6 +181,12 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginTop: 10,
+  },
+  versionText: {
+    fontSize: 12,
+    color: "#888",
+    textAlign: "center",
+    marginBottom: 10,
   },
 });
 
