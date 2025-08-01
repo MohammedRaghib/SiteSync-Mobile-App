@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
     color: "#333",
     textAlign: "center",
     marginBottom: 10,
+    paddingHorizontal: 20,
   },
   workerName: {
     fontSize: 18,

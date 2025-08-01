@@ -85,6 +85,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
+  permissionText: {
+    fontSize: 18,
+    padding: 10
+  },
   button: {
     backgroundColor: "#007AFF",
     padding: 15,

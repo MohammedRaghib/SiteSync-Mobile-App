@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   title: {
+    paddingTop: 20,
     fontSize: 26,
     fontWeight: "700",
     color: "#222",
