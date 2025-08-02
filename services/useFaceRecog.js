@@ -27,6 +27,8 @@ const useFaceRecognition = () => {
 
             let response;
             try {
+                console.log("📩 Sending POST request to URL:", requestUrl);
+
                 response = await fetch(requestUrl, {
                     method: "POST",
                     body: formData,
@@ -36,7 +38,6 @@ const useFaceRecognition = () => {
                 });
             } catch (err) {
                 console.error("❌ Fetch crashed:", err.message, err.stack);
-                Alert.alert("Network Error", `${err.message}`);
                 return { matchFound: false, error: err.message };
             }
 
