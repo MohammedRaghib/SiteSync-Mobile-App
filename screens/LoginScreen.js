@@ -9,10 +9,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Ionicons } from "react-native-vector-icons";
 import useCheckInfo from "../services/UserContext";
 import SwitchLanguage from "../Language/SwitchLanguage";
 import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
 import Constants from "expo-constants";
 
 const LoginScreen = () => {
@@ -24,6 +24,7 @@ const LoginScreen = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -48,7 +49,9 @@ const LoginScreen = () => {
 
       if (!userResponse.ok) {
         const errorText = await userResponse.json();
-        throw new Error(t("errors." + errorText.error_type || "errorLoginFailed"));
+        throw new Error(
+          t("errors." + errorText.error_type || "errorLoginFailed")
+        );
       }
 
       setErrorMessage("");
@@ -66,7 +69,6 @@ const LoginScreen = () => {
       }));
 
       navigation.navigate("Home");
-      // Alert.alert(t("successLogin"));
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -75,24 +77,19 @@ const LoginScreen = () => {
   };
 
   const getExpoPushToken = async () => {
-    let finalStatus;
-
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    finalStatus = existingStatus;
+    let finalStatus = existingStatus;
 
-    if (existingStatus !== 'granted') {
+    if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
 
-    if (finalStatus !== "granted") {
-      return null;
-    }
+    if (finalStatus !== "granted") return null;
 
     try {
       const tokenData = await Notifications.getExpoPushTokenAsync();
-      const expoPushToken = tokenData.data;
-      return expoPushToken;
+      return tokenData.data;
     } catch (error) {
       Alert.alert(t("errors.expo_token_required"));
       return null;
@@ -112,19 +109,36 @@ const LoginScreen = () => {
             value={username}
             onChangeText={setUsername}
           />
-          <TextInput
-            style={styles.input}
-            placeholder={t("auth.password")}
-            placeholderTextColor={"black"}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              placeholder={t("auth.password")}
+              placeholderTextColor={"black"}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={24}
+                color="black"
+                style={styles.eyeIcon}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleLogin}
+            disabled={loading}
+          >
             <Text style={styles.buttonText}>
               {loading ? t("ui.loading") : t("auth.login")}
             </Text>
           </TouchableOpacity>
+
           {errorMessage ? (
             <Text style={styles.error}>{errorMessage}</Text>
           ) : null}
@@ -155,7 +169,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   input: {
-    width: "80%",
     height: 45,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -163,6 +176,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     marginBottom: 15,
+    color: "black",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "80%",
+    height: 45,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  eyeIcon: {
+    marginLeft: 8,
   },
   button: {
     backgroundColor: "#007AFF",

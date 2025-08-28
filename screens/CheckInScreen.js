@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import CameraLocationComponent from "../components/CameraLocationComponent";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
-import useFaceRecognition from "../services/useFaceRecog";
 import CustomAlert from "../components/CustomAlert";
+import useCheckInfo from "../services/UserContext";
 
 function CheckInScreen() {
   const { t } = useTranslation();
+  const { loggedIn } = useCheckInfo();
   const { CheckInAttendance } = useAttendanceAndChecks();
-  const { recognizeFace } = useFaceRecognition();
 
   const [alert, setAlert] = useState({
     visible: false,
@@ -29,39 +29,39 @@ function CheckInScreen() {
 
   const handlePictureTaken = async (photo) => {
     try {
-      const data = await recognizeFace(photo.uri);
+      const send = {
+        image: photo.uri,
+      };
+      const checkIn = await CheckInAttendance(send);
 
-      if (data.matchFound) {
-        const send = {
-          subject_id: data.matched_worker?.person_id,
-          image: photo.uri,
-          is_unauthorized: false,
-        };
-        const checkIn = await CheckInAttendance(send);
-        showAlert("success", t(checkIn));
-      } else {
-        const send = {
-          image: photo.uri,
-          is_unauthorized: true,
-        };
-        const checkIn = await CheckInAttendance(send);
-        showAlert("error", t(checkIn));
+      if (!checkIn?.success){
+        throw new Error(t(checkIn?.message || "errors.fetchError" ));
       }
+
+      showAlert("success", t(checkIn?.message || "attendance.checkinSuccess"));
     } catch (error) {
       showAlert("error", error.message);
-      //Debug console.error("Check-in process failed:", error);
     }
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <CameraLocationComponent onPictureTaken={handlePictureTaken} />
-      <CustomAlert
-        visible={alert.visible}
-        type={alert.type}
-        message={alert.message}
-        onClose={closeAlert}
-      />
+      {loggedIn && (
+        <>
+          <CameraLocationComponent onPictureTaken={handlePictureTaken} />
+          <CustomAlert
+            visible={alert.visible}
+            type={alert.type}
+            message={alert.message}
+            onClose={closeAlert}
+          />
+        </>
+      )}
+      {!loggedIn && (
+        <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.text}>{t("ui.login")}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

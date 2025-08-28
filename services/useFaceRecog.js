@@ -8,7 +8,7 @@ const useFaceRecognition = () => {
     const [loading, setLoading] = useState(false);
 
     const { BACKEND_API_URLS } = useCheckInfo();
-    const BACKEND_API_URL = BACKEND_API_URLS.backend2;
+    const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
     const recognizeFace = async (imageUri) => {
         log.info("📸 Starting face recognition with image URI:", imageUri);
@@ -72,8 +72,8 @@ const useFaceRecognition = () => {
             }
 
             if (data.matchFound) {
-                log.info("👤 Match found:", data.matched_worker);
-                setMatchedWorker(data.matched_worker);
+                log.info("👤 Match found:", data.matchedPerson);
+                setMatchedWorker(data.matchedPerson);
             }
 
             return data;

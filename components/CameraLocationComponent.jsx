@@ -47,11 +47,8 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
         const photo = await cameraRef.current.takePictureAsync();
         onPictureTaken(photo);
       } catch (error) {
-        //Debug console.error("Error taking picture:", error);
         Alert.alert("An error occurred, please try again.");
       }
-    } else {
-      //Debug console.log("Camera not available");
     }
   };
 
@@ -87,7 +84,10 @@ const styles = StyleSheet.create({
   },
   permissionText: {
     fontSize: 18,
-    padding: 10
+    padding: 10,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#020101ff",
   },
   button: {
     backgroundColor: "#007AFF",

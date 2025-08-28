@@ -46,45 +46,37 @@ const useAttendanceAndChecks = () => {
       const attendanceInfo = await getAttendanceInfo();
       if (!attendanceInfo) throw new Error("errors.TimeAndLocationError");
 
-      let base64Image = null;
+      const formData = new FormData();
 
-      if (faceData?.image) {
-        log.info("🖼️ Converting image to base64...");
-        base64Image = await fetch(faceData?.image)
-          .then((res) => res.blob())
-          .then(
-            (blob) =>
-              new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result.split(",")[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-              })
-          );
+      formData.append("attendance_monitor_id", user.id);
+      formData.append("attendance_timestamp", attendanceInfo.timestamp);
+      formData.append("attendance_location", attendanceInfo.location);
+      formData.append("attendance_is_check_in", isCheckIn);
+      formData.append(
+        `attendance_is_supervisor_check_${isCheckIn ? "in" : "out"}`,
+        user.role === "supervisor"
+      );
+
+      for (const key in additionalFields) {
+        if (additionalFields[key] !== undefined && additionalFields[key] !== null) {
+          formData.append(key, additionalFields[key]);
+        }
       }
 
-      const payload = {
-        attendance_is_unauthorized: Boolean(faceData?.is_unauthorized),
-        attendance_subject_id: faceData?.subject_id || null,
-        attendance_monitor_id: user.id,
-        attendance_timestamp: attendanceInfo.timestamp,
-        attendance_location: attendanceInfo.location,
-        attendance_is_check_in: isCheckIn,
-        [`attendance_is_supervisor_check_${isCheckIn ? "in" : "out"}`]:
-          user.role === "supervisor",
-        attendance_photo: base64Image ? base64Image : null,
-        ...additionalFields,
-      };
+      if (faceData?.image) {
+        log.info("🖼️ Attaching image file...");
+        formData.append("attendance_photo", {
+          uri: faceData.image,
+          type: "image/jpeg",
+          name: "photo.jpg",
+        });
+      }
 
-      log.info("📤 Payload ready to send:", payload['attendance_subject_id']);
       log.info("🌐 Sending to endpoint:", `${BACKEND_API_URL}${endpoint}/`);
 
       const response = await fetch(`${BACKEND_API_URL}${endpoint}/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       log.info("📥 Server responded with status:", response.status);
@@ -92,16 +84,17 @@ const useAttendanceAndChecks = () => {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         log.error("❌ Server error response:", errorData);
-        throw new Error("errors." + errorData.error_type);
+        throw new Error("errors." + (errorData.error_type || "serverError"));
       }
 
       log.info("✅ Check-in success");
-      return "attendance.checkinSuccess";
+      return { message: "attendance.checkinSuccess", success: true };
     } catch (error) {
       log.error("🚨 Attendance error:", error.message);
-      return error.message;
+      return { message: error.message, success: false };
     }
   };
+
 
   const CheckInAttendance = (faceData) => {
     log.info("➡️ Check-In initiated...");
@@ -120,9 +113,7 @@ const useAttendanceAndChecks = () => {
   const SpecialReEntry = (faceData) => {
     log.info("🔁 Special Re-Entry initiated...");
     return sendAttendanceRequest("attendance", faceData, true, {
-      attendance_is_entry_permitted: faceData?.is_entry_permitted,
       attendance_is_special_re_entry: true,
-      attendance_is_unauthorized: !faceData?.is_entry_permitted,
       attendance_is_approved_by_supervisor: faceData?.is_approved_by_supervisor,
     });
   };

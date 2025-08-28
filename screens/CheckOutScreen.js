@@ -11,7 +11,7 @@ import CustomAlert from "../components/CustomAlert";
 function CheckOutScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
-  const { user } = useCheckInfo();
+  const { user, loggedIn } = useCheckInfo();
   const { CheckOutAttendance } = useAttendanceAndChecks();
   const { recognizeFace } = useFaceRecognition();
 
@@ -33,46 +33,50 @@ function CheckOutScreen() {
 
   const handlePictureTaken = async (photo) => {
     try {
-      const data = await recognizeFace(photo.uri);
+      if (user.role === "supervisor") {
+        const data = await recognizeFace(photo.uri);
 
-      if (data.matchFound) {
-        if (user.role === "supervisor") {
+        if (data.matchFound) {
           navigation.navigate("TaskCheck", {
-            faceData: { ...data.matched_worker, image: photo.uri },
+            faceData: { ...data.matchedPerson, image: photo.uri },
           });
         }
-        const send = {
-          subject_id: data.matched_worker?.person_id,
-          image: photo.uri,
-          is_unauthorized: false,
-          is_work_completed: data.matched_worker.is_work_completed,
-          is_equipment_returned: data.matched_worker.is_equipment_returned,
-        };
-        const checkOut = await CheckOutAttendance(send);
-        showAlert("success", t(checkOut));
-      } else {
-        const send = {
-          image: photo.uri,
-          is_unauthorized: true,
-        };
-        const checkOut = await CheckOutAttendance(send);
-        showAlert("error", t(checkOut));
       }
+
+      const send = {
+        image: photo.uri,
+      };
+
+      const checkOut = await CheckOutAttendance(send);
+
+      if (!checkOut.success) {
+        throw new Error(t(checkOut?.message || "errors.fetchError"));
+      }
+
+      showAlert("success", t(checkOut.message || "attendance.checkoutSuccess"));
     } catch (error) {
       showAlert("error", error.message);
-      //Debug console.error("Check-out process failed:", error);
     }
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <CameraLocationComponent onPictureTaken={handlePictureTaken} />
-      <CustomAlert
-        visible={alert.visible}
-        type={alert.type}
-        message={alert.message}
-        onClose={closeAlert}
-      />
+      {loggedIn && (
+        <>
+          <CameraLocationComponent onPictureTaken={handlePictureTaken} />
+          <CustomAlert
+            visible={alert.visible}
+            type={alert.type}
+            message={alert.message}
+            onClose={closeAlert}
+          />
+        </>
+      )}
+      {!loggedIn && (
+        <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.text}>{t("ui.login")}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

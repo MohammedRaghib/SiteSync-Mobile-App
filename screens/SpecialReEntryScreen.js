@@ -1,9 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
+import CustomAlert from "../components/CustomAlert";
 
 function SpecialReEntryScreen() {
   const navigation = useNavigation();
@@ -11,11 +12,14 @@ function SpecialReEntryScreen() {
   const { user, loggedIn, BACKEND_API_URLS } = useCheckInfo();
 
   const BACKEND_API_URL = BACKEND_API_URLS.backend1;
-
   const [SpecialReEntries, setSpecialReEntries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { SpecialReEntry } = useAttendanceAndChecks();
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
 
   const fetchEntries = async () => {
     setLoading(true);
@@ -31,7 +35,6 @@ function SpecialReEntryScreen() {
       const json = await response.json();
       setSpecialReEntries(json.special_re_entries || []);
     } catch (error) {
-      //Debug console.error("Error fetching data:", error);
       setErrorMessage(error.message);
     } finally {
       setLoading(false);
@@ -42,18 +45,21 @@ function SpecialReEntryScreen() {
     const ToSend = {
       subject_id: id,
       is_special_re_entry: allowed,
-      is_unauthorized: !allowed,
       is_approved_by_supervisor: allowed,
-      is_entry_permitted: allowed,
     };
 
     try {
       const response = await SpecialReEntry(ToSend);
-      Alert.alert(t(response));
+
+      setAlertMessage(t(response));
+      setAlertType("success");
+      setAlertVisible(true);
+
       fetchEntries();
     } catch (error) {
-      //Debug console.error("Error handling entry:", error);
-      setErrorMessage(t("errors.checkinFailure"));
+      setAlertMessage(t("errors.checkinFailure"));
+      setAlertType("error");
+      setAlertVisible(true);
     }
   };
 
@@ -63,6 +69,13 @@ function SpecialReEntryScreen() {
 
   return (
     <View style={styles.container}>
+      <CustomAlert
+        visible={alertVisible}
+        type={alertType}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+      />
+
       {user?.role === "supervisor" && (
         <>
           <Text style={styles.title}>{t("ui.specialReEntry")}</Text>

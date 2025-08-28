@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Alert,
   CheckBox,
   StyleSheet,
   Text,
@@ -13,6 +12,7 @@ import {
 } from "react-native";
 import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
+import CustomAlert from "../components/CustomAlert";
 
 function TaskCheckScreen() {
   const route = useRoute();
@@ -31,13 +31,17 @@ function TaskCheckScreen() {
     allEquipmentReturned: false,
   });
 
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
+
   const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
   const fetchTasks = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const response = await fetch(
-        `${BACKEND_API_URL}get_worker_tasks/${faceData?.person_id}/`
+        `${BACKEND_API_URL}get_worker_tasks/${faceData?.id}/`
       );
       const data = await response.json();
 
@@ -48,7 +52,6 @@ function TaskCheckScreen() {
       setState((prev) => ({ ...prev, tasks: data.tasks || [] }));
     } catch (e) {
       setState((prev) => ({ ...prev, error: e.message }));
-      //Debug console.error("Fetch error:", e);
     } finally {
       setState((prev) => ({ ...prev, loading: false }));
     }
@@ -81,28 +84,30 @@ function TaskCheckScreen() {
     try {
       const success = await CheckOutAttendance({
         ...faceData,
-        is_unauthorized: false,
         is_work_completed: state.allTasksCompleted,
         is_equipment_returned: state.allEquipmentReturned,
         is_incomplete_checkout:
           !state.allTasksCompleted || !state.allEquipmentReturned,
       });
 
-      Alert.alert(success);
-      navigation.goBack();
+      setAlertMessage(success);
+      setAlertType("success");
+      setAlertVisible(true);
+
+      setTimeout(() => {
+        navigation.goBack();
+      }, 1500);
     } catch (error) {
-      //Debug console.error("Checkout submission error:", error);
-      Alert.alert(
-        t("errors.checkoutFailure"),
-        error.message || t("errors.serverError")
-      );
+      setAlertMessage(error.message || t("errors.serverError"));
+      setAlertType("error");
+      setAlertVisible(true);
     } finally {
       setState((prev) => ({ ...prev, submitting: false }));
     }
   };
 
   useEffect(() => {
-    if (faceData?.person_id) {
+    if (faceData?.id) {
       fetchTasks();
     }
   }, [faceData]);
@@ -135,6 +140,13 @@ function TaskCheckScreen() {
 
   return (
     <View style={styles.container}>
+      <CustomAlert
+        visible={alertVisible}
+        type={alertType}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+      />
+
       {user?.role === "supervisor" && (
         <>
           <Text style={styles.title}>
