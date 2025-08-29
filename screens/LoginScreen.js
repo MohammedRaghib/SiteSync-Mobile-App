@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     marginLeft: 8,
+    zIndex: 10
   },
   button: {
     backgroundColor: "#007AFF",
