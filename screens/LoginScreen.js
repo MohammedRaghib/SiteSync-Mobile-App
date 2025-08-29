@@ -112,7 +112,7 @@ const LoginScreen = () => {
 
           <View style={styles.passwordContainer}>
             <TextInput
-              style={[styles.input, { flex: 1 }]}
+              style={styles.passwordInput}
               placeholder={t("auth.password")}
               placeholderTextColor={"black"}
               secureTextEntry={!showPassword}
@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   input: {
+    width: "80%",
     height: 45,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -188,6 +189,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 15,
+  },
+  passwordInput: {
+    flex: 1,
+    height: "100%",
+    color: "black",
+    fontSize: 16,
   },
   eyeIcon: {
     marginLeft: 8,
