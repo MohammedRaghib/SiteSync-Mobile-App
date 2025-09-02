@@ -88,16 +88,16 @@ function SpecialReEntryScreen() {
             <ScrollView contentContainerStyle={styles.scrollContent}>
               {SpecialReEntries.map((entry) => (
                 <View
-                  key={entry.attendance_subject?.id}
+                  key={entry.subject?.id}
                   style={styles.item}
                 >
                   <Text style={styles.name}>
-                    {entry.attendance_subject?.person_name}
+                    {entry.subject?.name}
                   </Text>
                   <View style={styles.actions}>
                     <TouchableOpacity
                       onPress={() =>
-                        HandleEntry(entry.attendance_subject?.person_id, true)
+                        HandleEntry(entry.subject?.id, true)
                       }
                       style={[styles.button, styles.acceptButton]}
                     >
@@ -106,7 +106,7 @@ function SpecialReEntryScreen() {
 
                     <TouchableOpacity
                       onPress={() =>
-                        HandleEntry(entry.attendance_subject?.person_id, false)
+                        HandleEntry(entry.subject?.id, false)
                       }
                       style={[styles.button, styles.declineButton]}
                     >
