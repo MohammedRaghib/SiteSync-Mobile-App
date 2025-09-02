@@ -50,7 +50,7 @@ const useAttendanceAndChecks = () => {
 
       formData.append("attendance_monitor_id", user.id);
       formData.append("attendance_timestamp", attendanceInfo.timestamp);
-      formData.append("attendance_location", attendanceInfo.location);
+      formData.append("attendance_location", JSON.stringify(attendanceInfo.location));
       formData.append("attendance_is_check_in", isCheckIn);
       formData.append(
         `attendance_is_supervisor_check_${isCheckIn ? "in" : "out"}`,

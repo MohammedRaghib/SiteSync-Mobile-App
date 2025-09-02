@@ -41,7 +41,7 @@ function TaskCheckScreen() {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const response = await fetch(
-        `${BACKEND_API_URL}get_worker_tasks/${faceData?.id}/`
+        `${BACKEND_API_URL}get_person_tasks/${faceData?.id}/`
       );
       const data = await response.json();
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Alert, Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import { Alert, Text, TouchableOpacity, View, StyleSheet, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
   const { t } = useTranslation();
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const [loading, setLoading] = useState(false);
   const cameraRef = useRef(null);
 
   const requestBothPermissions = async () => {
@@ -43,20 +44,33 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
 
   const takePicture = async () => {
     if (cameraRef.current) {
+      setLoading(true);
       try {
         const photo = await cameraRef.current.takePictureAsync();
         onPictureTaken(photo);
       } catch (error) {
         Alert.alert("An error occurred, please try again.");
+      } finally {
+        setLoading(false);
       }
     }
   };
 
   return (
     <View style={styles.container}>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      )}
+
       <Text style={styles.info}>{t("ui.neutralExpression")}</Text>
       <CameraView ref={cameraRef} style={styles.camera} />
-      <TouchableOpacity onPress={takePicture} style={styles.captureButton}>
+      <TouchableOpacity
+        onPress={takePicture}
+        style={[styles.captureButton, loading && styles.disabledButton]}
+        disabled={loading}
+      >
         <Text style={styles.buttonText}>{t("ui.capturePhoto")}</Text>
       </TouchableOpacity>
     </View>
@@ -108,6 +122,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#007AFF",
     padding: 15,
     borderRadius: 50,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
 });
 

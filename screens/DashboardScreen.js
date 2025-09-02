@@ -90,8 +90,8 @@ const DashboardScreen = () => {
             ) : AbsenteesView ? (
               AbsenteesData.length > 0 ? (
                 AbsenteesData.map((absentee) => (
-                  <View key={absentee.person_id} style={styles.item}>
-                    <Text style={styles.name}>{absentee.person_name}</Text>
+                  <View key={absentee.id} style={styles.item}>
+                    <Text style={styles.name}>{absentee.name}</Text>
                   </View>
                 ))
               ) : (
@@ -100,14 +100,14 @@ const DashboardScreen = () => {
             ) : AttendanceData.length > 0 ? (
               AttendanceData.map((attendance) => (
                 <View
-                  key={attendance.attendance_subject?.person_id}
+                  key={attendance.subject?.id}
                   style={styles.item}
                 >
                   <Text style={styles.name}>
-                    {t("ui.name")} - {attendance.attendance_subject?.person_name}
+                    {t("ui.name")} - {attendance.subject?.name}
                   </Text>
                   <Text style={styles.status}>
-                    {t("ui.checkedinby")} {attendance.attendance_is_supervisor_checkin ? t("ui.supervisor") : t("ui.guard")} - {new Date(attendance.attendance_timestamp).toLocaleTimeString([], {
+                    {t("ui.checkedinby")} {attendance.is_supervisor_checkin ? t("ui.supervisor") : t("ui.guard")} - {new Date(attendance.timestamp).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                       hour12: true,

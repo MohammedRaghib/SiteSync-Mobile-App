@@ -14,6 +14,7 @@ import useCheckInfo from "../services/UserContext";
 import SwitchLanguage from "../Language/SwitchLanguage";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import log from "../services/Logger";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -37,26 +38,32 @@ const LoginScreen = () => {
     setLoading(true);
     try {
       const expoToken = await getExpoPushToken();
-      const formData = new FormData();
-      formData.append("username", username.trim());
-      formData.append("password", password);
-      formData.append("expo_token", expoToken);
 
       const userResponse = await fetch(`${BACKEND_API_URL}login/`, {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username.trim(),
+          password,
+          expo_token: expoToken
+        })
       });
 
-      if (!userResponse.ok) {
-        const errorText = await userResponse.json();
-        throw new Error(
-          t("errors." + errorText.error_type || "errorLoginFailed")
-        );
+      const rawText = await userResponse.text();
+      log.info("📩 Raw Response Text", rawText);
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (e) {
+        throw new Error(t("errors.errorLoginFailed"));
       }
 
-      setErrorMessage("");
-      const userData = await userResponse.json();
-      const { person_id, role_name } = userData;
+      if (!userResponse.ok) {
+        throw new Error(t("errors." + (data.error_type || "errorLoginFailed")));
+      }
+
+      const { person_id, role_name } = data;
 
       const newUser = {
         id: person_id,
