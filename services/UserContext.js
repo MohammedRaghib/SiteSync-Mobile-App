@@ -66,9 +66,7 @@ export function CheckInfoProvider({ children }) {
         backend1: data.backend1,
         backend2: data.backend2
       }));
-      Alert.alert(data.backend1);
     } catch (e) {
-      Alert.alert(e.message);
     }
   }
 
