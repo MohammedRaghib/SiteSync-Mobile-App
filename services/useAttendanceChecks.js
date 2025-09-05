@@ -65,11 +65,11 @@ const useAttendanceAndChecks = () => {
 
       if (faceData?.image) {
         log.info("🖼️ Attaching image file...");
-        formData.append("attendance_photo", {
-          uri: faceData.image,
-          type: "image/jpeg",
-          name: "photo.jpg",
-        });
+        
+        const imageResponse = await fetch(faceData.image);
+        const imageBlob = await imageResponse.blob();
+        
+        formData.append("attendance_photo", imageBlob, "photo.jpg");
       }
 
       log.info("🌐 Sending to endpoint:", `${BACKEND_API_URL}${endpoint}/`);
