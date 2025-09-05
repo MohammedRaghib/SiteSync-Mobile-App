@@ -47,7 +47,7 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
       setLoading(true);
       try {
         const photo = await cameraRef.current.takePictureAsync();
-        onPictureTaken(photo);
+        await onPictureTaken(photo);
       } catch (error) {
         Alert.alert("An error occurred, please try again.");
       } finally {
