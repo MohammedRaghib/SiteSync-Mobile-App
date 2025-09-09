@@ -42,6 +42,7 @@ function SpecialReEntryScreen() {
   };
 
   const HandleEntry = async (id, allowed) => {
+    setLoading(true);
     const ToSend = {
       subject_id: id,
       is_special_re_entry: allowed,
@@ -51,7 +52,11 @@ function SpecialReEntryScreen() {
     try {
       const response = await SpecialReEntry(ToSend);
 
-      setAlertMessage(t(response));
+      if (!response.success) {
+        throw new Error(t(response?.message || "errors.checkinFailure"));
+      }
+
+      setAlertMessage(t(response.message || "errors.checkinSuccess"));
       setAlertType("success");
       setAlertVisible(true);
 
@@ -60,6 +65,8 @@ function SpecialReEntryScreen() {
       setAlertMessage(t("errors.checkinFailure"));
       setAlertType("error");
       setAlertVisible(true);
+    } finally {
+      setLoading(false);
     }
   };
 
