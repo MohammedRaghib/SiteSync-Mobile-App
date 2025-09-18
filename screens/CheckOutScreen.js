@@ -40,6 +40,7 @@ function CheckOutScreen() {
           navigation.navigate("TaskCheck", {
             faceData: { ...data.matchedPerson, image: photo.uri },
           });
+          return;
         }
       }
 

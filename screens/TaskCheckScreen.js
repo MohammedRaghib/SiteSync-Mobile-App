@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  CheckBox,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   ScrollView,
 } from "react-native";
+import CheckBox from "@react-native-community/checkbox";
 import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
 import CustomAlert from "../components/CustomAlert";
@@ -31,11 +31,23 @@ function TaskCheckScreen() {
     allEquipmentReturned: false,
   });
 
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState("success");
+  const [alert, setAlert] = useState({
+    visible: false,
+    type: "success",
+    message: "",
+  });
 
   const BACKEND_API_URL = BACKEND_API_URLS.backend1;
+
+  const showAlert = (type, message) => {
+    setAlert({
+      visible: true,
+      type,
+      message,
+    });
+  };
+
+  const closeAlert = () => setAlert({ ...alert, visible: false });
 
   const fetchTasks = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
@@ -90,17 +102,21 @@ function TaskCheckScreen() {
           !state.allTasksCompleted || !state.allEquipmentReturned,
       });
 
-      setAlertMessage(success);
-      setAlertType("success");
-      setAlertVisible(true);
+      if (!success.success) {
+        throw new Error(t(success?.message || "errors.serverError"));
+      }
+
+      showAlert("success", t(success?.message || "attendance.checkoutSuccess"));
 
       setTimeout(() => {
-        navigation.goBack();
+        navigation.navigate("Home");
       }, 1500);
     } catch (error) {
-      setAlertMessage(error.message || t("errors.serverError"));
-      setAlertType("error");
-      setAlertVisible(true);
+      if (error.message.includes("Network request failed")) {
+        showAlert("error", t("errors.networkError"));
+      } else {
+        showAlert("error", error.message);
+      }
     } finally {
       setState((prev) => ({ ...prev, submitting: false }));
     }
@@ -141,10 +157,10 @@ function TaskCheckScreen() {
   return (
     <View style={styles.container}>
       <CustomAlert
-        visible={alertVisible}
-        type={alertType}
-        message={alertMessage}
-        onClose={() => setAlertVisible(false)}
+        visible={alert.visible}
+        type={alert.type}
+        message={alert.message}
+        onClose={closeAlert}
       />
 
       {user?.role === "supervisor" && (
@@ -313,6 +329,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
+    borderColor: "#0c0b0bff",
   },
   checkboxLabel: {
     fontSize: 16,

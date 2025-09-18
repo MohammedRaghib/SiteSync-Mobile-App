@@ -45,7 +45,6 @@ function SpecialReEntryScreen() {
     setLoading(true);
     const ToSend = {
       subject_id: id,
-      is_special_re_entry: allowed,
       is_approved_by_supervisor: allowed,
     };
 

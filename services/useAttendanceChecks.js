@@ -89,7 +89,9 @@ const useAttendanceAndChecks = () => {
         body: formData,
       });
 
-      log.info("📥 Server responded with status:", response.status);
+      const json = await response.json();
+
+      log.info("📥 Server responded with:", json);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -97,8 +99,8 @@ const useAttendanceAndChecks = () => {
         throw new Error("errors." + (errorData.error_type || "serverError"));
       }
 
-      log.info("✅ Check-in success");
-      return { message: "attendance.checkinSuccess", success: true };
+      log.info(`✅ Check-${isCheckIn ? "in" : "out"} success`);
+      return { message: `attendance.check${isCheckIn ? "in" : "out"}Success`, success: true };
     } catch (error) {
       log.error("🚨 Attendance error:", error.message);
       return { message: error.message, success: false };

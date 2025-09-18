@@ -11,6 +11,7 @@
     "taskCheck": "Task Check",
     "status": "Status",
     "name": "Name",
+    "equipment": "Equipment",
     "checkedinby": "Checked in by",
     "actions": "Actions",
     "capturePhoto": "Capture Photo",
@@ -81,6 +82,7 @@
     "invalid_location": "Invalid location format.",
     "missing_field": "Required field not present in request.",
     "missing_checkin": "No valid check-in found for checkout.",
-    "already_checked_out": "Person already checked out."
+    "already_checked_out": "Person already checked out.",
+    "already_checked_in" : "Person already checked in."
   }
 }
