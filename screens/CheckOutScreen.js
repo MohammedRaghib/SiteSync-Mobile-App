@@ -55,7 +55,11 @@ function CheckOutScreen() {
 
       showAlert("success", t(checkOut.message || "attendance.checkoutSuccess"));
     } catch (error) {
-      showAlert("error", error.message);
+      if (error.message.includes("Network request failed")) {
+        showAlert("error", t("errors.networkError"));
+      } else {
+        showAlert("error", error.message);
+      }
     }
   };
 

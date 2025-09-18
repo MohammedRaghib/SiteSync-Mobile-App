@@ -44,6 +44,7 @@
     "supervisorTaskCheck": "Supervisor Task Check"
   },
   "errors": {
+    "networkError": "Could not connect to the server. Please check your internet connection.",
     "fetchUrlError": "Failed to fetch Backend URLs.",
     "fetchError": "Failed to fetch data.",
     "serverError": "Server error occurred.",

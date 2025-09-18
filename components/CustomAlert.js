@@ -21,7 +21,7 @@ export default function CustomAlert({ visible, type, message, onClose }) {
         }}>
           <Text style={{ color: "#fff", fontSize: 16 }}>{message}</Text>
           <TouchableOpacity onPress={onClose} style={{ marginTop: 18 }}>
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>Close</Text>
+            <Text style={{ color: "#fff", fontWeight: "bold", padding: 10 }}>Close</Text>
           </TouchableOpacity>
         </View>
       </View>
