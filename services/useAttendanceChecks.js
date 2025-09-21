@@ -89,14 +89,19 @@ const useAttendanceAndChecks = () => {
         body: formData,
       });
 
-      const json = await response.json();
+      let json = {};
 
-      log.info("📥 Server responded with:", json);
+      try {
+        json = response ? await response.json() : {};
+      } catch (e) {
+        json = { _raw: response };
+      }
+
+      log.info("📥 Server responded with:", json, "status:", response.status);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        log.error("❌ Server error response:", errorData);
-        throw new Error("errors." + (errorData.error_type || "serverError"));
+        log.error("❌ Server error response:", json.message || "Unknown error");
+        throw new Error("errors." + (json.error_type || "serverError"));
       }
 
       log.info(`✅ Check-${isCheckIn ? "in" : "out"} success`);
