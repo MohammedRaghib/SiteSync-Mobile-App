@@ -49,6 +49,7 @@ const useAttendanceAndChecks = () => {
       const formData = new FormData();
 
       formData.append("attendance_monitor_id", user.id);
+      formData.append("attendance_project_id", user.projectId);
       formData.append("attendance_timestamp", attendanceInfo.timestamp);
       formData.append("attendance_location", JSON.stringify(attendanceInfo.location));
       formData.append("attendance_is_check_in", isCheckIn);
@@ -132,6 +133,7 @@ const useAttendanceAndChecks = () => {
     return sendAttendanceRequest("attendance", faceData, true, {
       attendance_is_special_re_entry: true,
       attendance_is_approved_by_supervisor: faceData?.is_approved_by_supervisor,
+      attendance_subject_id: faceData?.subject_id,
     });
   };
 

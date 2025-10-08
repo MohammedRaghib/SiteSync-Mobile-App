@@ -43,6 +43,13 @@ function HomeScreen() {
           >
             <Text style={styles.text}>{t("attendance.checkIn")}</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() => navigation.navigate("Projects")}
+          >
+            <Text style={styles.text}>{t("attendance.projects")}</Text>
+          </TouchableOpacity>
         </>
       )}
 

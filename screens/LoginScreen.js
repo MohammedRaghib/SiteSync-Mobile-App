@@ -38,7 +38,8 @@ const LoginScreen = () => {
     setLoading(true);
     try {
       const expoToken = await getExpoPushToken();
-
+      
+      log.info("Posting login request to URL: ", BACKEND_API_URL);
       const userResponse = await fetch(`${BACKEND_API_URL}login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,7 +76,7 @@ const LoginScreen = () => {
         ...newUser,
       }));
 
-      navigation.navigate("Home");
+      navigation.navigate("Projects");
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -98,7 +99,8 @@ const LoginScreen = () => {
       const tokenData = await Notifications.getExpoPushTokenAsync();
       return tokenData.data;
     } catch (error) {
-      Alert.alert(t("errors.expo_token_required"));
+      log.error("Failed to get Expo push token:", error);
+      setErrorMessage(t("errors.expo_token_required"));
       return null;
     }
   };

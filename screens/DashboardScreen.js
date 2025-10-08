@@ -21,7 +21,7 @@ const DashboardScreen = () => {
     setLoading(true);
     setErrorMessage("");
     try {
-      const response = await fetch(`${BACKEND_API_URL}supervisor_dashboard?supervisor_id=${user?.id}`);
+      const response = await fetch(`${BACKEND_API_URL}supervisor_dashboard?supervisor_id=${user?.id}&project_id=${user?.projectId}`);
       if (!response.ok) {
         const jsonError = await response.json();
         throw new Error(t("errors." + jsonError.error_type || "fetchError"));
@@ -39,7 +39,7 @@ const DashboardScreen = () => {
     setLoading(true);
     setErrorMessage("");
     try {
-      const response = await fetch(`${BACKEND_API_URL}project_absentees?supervisor_id=${user?.id}`);
+      const response = await fetch(`${BACKEND_API_URL}project_absentees?supervisor_id=${user?.id}&project_id=${user?.projectId}`);
 
       if (!response.ok) {
         const jsonError = await response.json();

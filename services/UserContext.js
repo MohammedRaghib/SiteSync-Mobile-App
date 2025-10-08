@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert } from "react-native";
+import log from "./Logger";
 
 const CheckInfo = createContext(null);
 
@@ -9,7 +9,10 @@ export function CheckInfoProvider({ children }) {
   const [user, setUser] = useState({
     id: "",
     role: "",
+    projectId: "",
+    projectName: "",
   });
+  
   const [BACKEND_API_URLS, setBACKEND_API_URLS] = useState({
     backend1: '',
     backend2: ''
@@ -66,7 +69,10 @@ export function CheckInfoProvider({ children }) {
         backend1: data.backend1,
         backend2: data.backend2
       }));
+
+      log.info("Fetched backend URLs:", data);
     } catch (e) {
+      log.error("Error fetching backend URLs:", e);
     }
   }
 

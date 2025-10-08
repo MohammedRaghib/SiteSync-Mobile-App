@@ -25,7 +25,7 @@ function SpecialReEntryScreen() {
     setLoading(true);
     setErrorMessage("");
     try {
-      const response = await fetch(`${BACKEND_API_URL}get_special_re_entries/`);
+      const response = await fetch(`${BACKEND_API_URL}get_special_re_entries?project_id=${user?.projectId}`);
 
       if (!response.ok) {
         const jsonError = await response.json();
@@ -61,11 +61,12 @@ function SpecialReEntryScreen() {
 
       fetchEntries();
     } catch (error) {
-      setAlertMessage(t("errors.checkinFailure"));
+      setAlertMessage(error.message);
       setAlertType("error");
       setAlertVisible(true);
     } finally {
       setLoading(false);
+      fetchEntries();
     }
   };
 
