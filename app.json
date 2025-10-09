@@ -3,7 +3,7 @@
     "name": "Site Sync",
     "slug": "SiteSync",
     "owner": "mohammedraghib",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

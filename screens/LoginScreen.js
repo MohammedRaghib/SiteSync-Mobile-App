@@ -78,6 +78,7 @@ const LoginScreen = () => {
 
       navigation.navigate("Projects");
     } catch (error) {
+      log.error(error);
       setErrorMessage(error.message);
     } finally {
       setLoading(false);
