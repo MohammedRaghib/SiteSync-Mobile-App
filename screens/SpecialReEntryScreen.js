@@ -65,8 +65,8 @@ function SpecialReEntryScreen() {
       setAlertType("error");
       setAlertVisible(true);
     } finally {
+      await fetchEntries();
       setLoading(false);
-      fetchEntries();
     }
   };
 

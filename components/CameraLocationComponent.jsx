@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Alert, Text, TouchableOpacity, View, StyleSheet, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import Icon from "react-native-vector-icons/MaterialIcons";
 import { useTranslation } from "react-i18next";
 
 const CameraLocationComponent = ({ onPictureTaken }) => {
@@ -9,6 +10,7 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [loading, setLoading] = useState(false);
+  const [facing, setFacing] = useState("back");
   const cameraRef = useRef(null);
 
   const requestBothPermissions = async () => {
@@ -31,16 +33,9 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
     requestBothPermissions();
   }, []);
 
-  if (!cameraPermission?.granted || !locationPermissionGranted) {
-    return (
-      <View style={styles.permissionContainer}>
-        <Text style={styles.permissionText}>{t("ui.AllPermissions")}</Text>
-        <TouchableOpacity onPress={requestBothPermissions} style={styles.button}>
-          <Text style={styles.buttonText}>{t("ui.grantPermission")}</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  const toggleCameraFacing = () => {
+    setFacing((prev) => (prev === "back" ? "front" : "back"));
+  };
 
   const takePicture = async () => {
     if (cameraRef.current) {
@@ -56,23 +51,46 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
     }
   };
 
+  if (!cameraPermission?.granted || !locationPermissionGranted) {
+    return (
+      <View style={styles.permissionContainer}>
+        <Text style={styles.permissionText}>{t("ui.AllPermissions")}</Text>
+        <TouchableOpacity onPress={requestBothPermissions} style={styles.button}>
+          <Text style={styles.buttonText}>{t("ui.grantPermission")}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#fff" />
-        </View>
-      )}
+      <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        )}
 
-      <Text style={styles.info}>{t("ui.neutralExpression")}</Text>
-      <CameraView ref={cameraRef} style={styles.camera} />
-      <TouchableOpacity
-        onPress={takePicture}
-        style={[styles.captureButton, loading && styles.disabledButton]}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>{t("ui.capturePhoto")}</Text>
-      </TouchableOpacity>
+        <View style={styles.overlay}>
+          <Text style={styles.infoText}>{t("ui.neutralExpression")}</Text>
+
+          <View style={styles.bottomControls}>
+            <TouchableOpacity onPress={toggleCameraFacing} style={styles.flipButton}>
+              <Icon name="flip-camera-ios" size={36} color="#fff" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={takePicture}
+              style={[styles.captureOuter, loading && styles.disabledButton]}
+              disabled={loading}
+            >
+              <View style={styles.captureInner} />
+            </TouchableOpacity>
+
+            <View style={{ width: 50 }} />
+          </View>
+        </View>
+      </CameraView>
     </View>
   );
 };
@@ -81,14 +99,52 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#000",
-    alignItems: "center",
-    justifyContent: "center",
   },
-  info: {
+  camera: {
+    flex: 1,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "space-between",
+    paddingVertical: 30,
+  },
+  infoText: {
+    textAlign: "center",
     fontSize: 18,
     color: "#fff",
-    textAlign: "center",
-    paddingVertical: 20,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    paddingVertical: 8,
+    marginHorizontal: 20,
+    borderRadius: 8,
+  },
+  bottomControls: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingBottom: 20,
+  },
+  flipButton: {
+    backgroundColor: "rgba(0,0,0,0.4)",
+    padding: 10,
+    borderRadius: 50,
+  },
+  captureOuter: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 5,
+    borderColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  captureInner: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#fff",
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   permissionContainer: {
     flex: 1,
@@ -111,20 +167,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
-  },
-  camera: {
-    flex: 1,
-    width: "100%",
-  },
-  captureButton: {
-    position: "absolute",
-    bottom: 20,
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 50,
-  },
-  disabledButton: {
-    opacity: 0.5,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,

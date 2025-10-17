@@ -1,6 +1,7 @@
 import useCheckInfo from "./UserContext";
 import * as Location from "expo-location";
 import log from "./Logger";
+import DeviceInfo from 'react-native-device-info';
 
 const useAttendanceAndChecks = () => {
   const { user, BACKEND_API_URLS } = useCheckInfo();
@@ -22,11 +23,22 @@ const useAttendanceAndChecks = () => {
 
       log.info("📍 Location acquired:", coords);
 
+      const brand = DeviceInfo.getBrand();
+      const manufacturer = await DeviceInfo.getManufacturer();
+      const model = DeviceInfo.getModel();
+
+      log.info("📱 Device info:", model, manufacturer, brand);
+
       return {
         timestamp,
         location: {
           latitude: coords.latitude,
           longitude: coords.longitude,
+        },
+        device: {
+          model,
+          brand,
+          manufacturer,
         },
       };
     } catch (error) {
@@ -52,6 +64,9 @@ const useAttendanceAndChecks = () => {
       formData.append("attendance_project_id", user.projectId);
       formData.append("attendance_timestamp", attendanceInfo.timestamp);
       formData.append("attendance_location", JSON.stringify(attendanceInfo.location));
+      formData.append("attendance_device_manufacturer", attendanceInfo.device.manufacturer || "",);
+      formData.append("attendance_device_brand", attendanceInfo.device.brand || "",);
+      formData.append("attendance_device_model", attendanceInfo.device.model || "",);
       formData.append("attendance_is_check_in", isCheckIn);
       formData.append(
         `attendance_is_supervisor_check_${isCheckIn ? "in" : "out"}`,
