@@ -1,7 +1,9 @@
 import useCheckInfo from "./UserContext";
 import * as Location from "expo-location";
 import log from "./Logger";
-import DeviceInfo from 'react-native-device-info';
+import DeviceInfo from "react-native-device-info";
+import ImageResizer from "react-native-image-resizer";
+import NetInfo from "@react-native-community/netinfo";
 
 const useAttendanceAndChecks = () => {
   const { user, BACKEND_API_URLS } = useCheckInfo();
@@ -47,6 +49,32 @@ const useAttendanceAndChecks = () => {
     }
   };
 
+  // 🔹 NEW helper: compress image intelligently before upload
+  const compressImageIfNeeded = async (uri) => {
+    try {
+      const { type } = await NetInfo.fetch();
+      const quality = type === "wifi" ? 80 : 60; // adaptive compression
+
+      const resized = await ImageResizer.createResizedImage(
+        uri,
+        800, // max width
+        800, // max height
+        "JPEG",
+        quality
+      );
+
+      log.info(
+        `🗜️ Image compressed (${quality}% quality):`,
+        resized.size ? `${(resized.size / 1024).toFixed(1)} KB` : "unknown size"
+      );
+
+      return resized.uri;
+    } catch (err) {
+      log.error("⚠️ Image compression failed, using original file:", err.message);
+      return uri;
+    }
+  };
+
   const sendAttendanceRequest = async (
     endpoint,
     faceData,
@@ -64,9 +92,9 @@ const useAttendanceAndChecks = () => {
       formData.append("attendance_project_id", user.projectId);
       formData.append("attendance_timestamp", attendanceInfo.timestamp);
       formData.append("attendance_location", JSON.stringify(attendanceInfo.location));
-      formData.append("attendance_device_manufacturer", attendanceInfo.device.manufacturer || "",);
-      formData.append("attendance_device_brand", attendanceInfo.device.brand || "",);
-      formData.append("attendance_device_model", attendanceInfo.device.model || "",);
+      formData.append("attendance_device_manufacturer", attendanceInfo.device.manufacturer || "");
+      formData.append("attendance_device_brand", attendanceInfo.device.brand || "");
+      formData.append("attendance_device_model", attendanceInfo.device.model || "");
       formData.append("attendance_is_check_in", isCheckIn);
       formData.append(
         `attendance_is_supervisor_check_${isCheckIn ? "in" : "out"}`,
@@ -82,31 +110,30 @@ const useAttendanceAndChecks = () => {
       if (faceData?.image) {
         log.info("🖼️ Attaching image file...");
 
-        const localUri = faceData.image;
-
-        const filename = localUri.split('/').pop();
-
+        // 🔹 Compress image before attaching
+        const optimizedUri = await compressImageIfNeeded(faceData.image);
+        const filename = optimizedUri.split("/").pop();
         const match = /\.(jpg|jpeg|png)$/i.exec(filename);
-        const type = match ? `image/${match[1]}` : `image`;
+        const type = match ? `image/${match[1]}` : "image/jpeg";
 
-        const fileToUpload = {
-          uri: localUri,
+        formData.append("attendance_photo", {
+          uri: optimizedUri,
           name: filename,
-          type: type,
-        };
-
-        formData.append("attendance_photo", fileToUpload);
+          type,
+        });
       }
 
       log.info("🌐 Sending to endpoint:", `${BACKEND_API_URL}${endpoint}/`);
 
+      const start = Date.now();
       const response = await fetch(`${BACKEND_API_URL}${endpoint}/`, {
         method: "POST",
         body: formData,
       });
+      const duration = ((Date.now() - start) / 1000).toFixed(2);
+      log.info(`⏱️ Upload completed in ${duration}s`);
 
       let json = {};
-
       try {
         json = response ? await response.json() : {};
       } catch (e) {
@@ -127,7 +154,6 @@ const useAttendanceAndChecks = () => {
       return { message: error.message, success: false };
     }
   };
-
 
   const CheckInAttendance = (faceData) => {
     log.info("➡️ Check-In initiated...");
