@@ -1,6 +1,6 @@
 import useCheckInfo from "./UserContext";
 import * as Location from "expo-location";
-import log from "./Logger";
+import log from "../components/Logger";
 import DeviceInfo from "react-native-device-info";
 import ImageResizer from "react-native-image-resizer";
 import NetInfo from "@react-native-community/netinfo";

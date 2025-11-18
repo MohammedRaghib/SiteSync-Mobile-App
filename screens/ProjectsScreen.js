@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StyleSheet, Text, TouchableOpacity, ScrollView, View } from "react-native";
-import log from "../services/Logger";
+import log from "../components/Logger";
 import { useTranslation } from "react-i18next";
 import useCheckInfo from "../services/UserContext";
 

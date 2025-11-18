@@ -1,14 +1,14 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import LoginScreen from "../screens/LoginScreen";
-import Projects from "../screens/ProjectsScreen";
-import HomeScreen from "../screens/HomeScreen";
-import DashboardScreen from "../screens/DashboardScreen";
-import CheckInScreen from "../screens/CheckInScreen";
-import CheckOutScreen from "../screens/CheckOutScreen";
-import TaskCheckScreen from "../screens/TaskCheckScreen";
-import SpecialReEntryScreen from "../screens/SpecialReEntryScreen";
+import LoginScreen from "./screens/LoginScreen";
+import Projects from "./screens/ProjectsScreen";
+import HomeScreen from "./screens/HomeScreen";
+import DashboardScreen from "./screens/DashboardScreen";
+import CheckInScreen from "./screens/CheckInScreen";
+import CheckOutScreen from "./screens/CheckOutScreen";
+import TaskCheckScreen from "./screens/TaskCheckScreen";
+import SpecialReEntryScreen from "./screens/SpecialReEntryScreen";
 
 const Stack = createNativeStackNavigator();
 

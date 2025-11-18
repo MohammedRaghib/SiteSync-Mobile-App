@@ -1,4 +1,4 @@
-import AppNavigator from "./navigation/AppNavigator";
+import AppNavigator from "./AppNavigator";
 import { CheckInfoProvider } from "./services/UserContext";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";

@@ -14,7 +14,7 @@ import useCheckInfo from "../services/UserContext";
 import SwitchLanguage from "../Language/SwitchLanguage";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import log from "../services/Logger";
+import log from "../components/Logger";
 
 const LoginScreen = () => {
   const navigation = useNavigation();

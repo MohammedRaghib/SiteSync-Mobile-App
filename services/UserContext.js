@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import log from "./Logger";
+import log from "../components/Logger";
 
 const CheckInfo = createContext(null);
 

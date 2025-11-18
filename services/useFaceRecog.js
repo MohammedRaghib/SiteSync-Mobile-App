@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Alert } from "react-native";
 import useCheckInfo from "./UserContext";
-import log from "./Logger";
+import log from "../components/Logger";
 
 const useFaceRecognition = () => {
     const [matchedWorker, setMatchedWorker] = useState(null);

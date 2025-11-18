@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import useCheckInfo from "../services/UserContext";
-import log from "../services/Logger";
+import log from "../components/Logger";
 
 const TabButton = ({ title, isActive, onPress }) => (
   <TouchableOpacity
