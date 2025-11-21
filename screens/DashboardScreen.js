@@ -182,12 +182,12 @@ const DashboardScreen = () => {
 
           <View style={styles.tabBar}>
             <TabButton
-              title={t("attendance.checkIn")}
+              title={t("ui.checkIn")}
               isActive={activeTab === 'attendance'}
               onPress={() => handleTabChange('attendance')}
             />
             <TabButton
-              title={t("attendance.checkOut")}
+              title={t("ui.checkOut")}
               isActive={activeTab === 'checkouts'}
               onPress={() => handleTabChange('checkouts')}
             />
@@ -206,10 +206,10 @@ const DashboardScreen = () => {
       {loggedIn && user?.role === "guard" && (
         <>
           <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("CheckIn")}>
-            <Text style={styles.text}>{t("attendance.checkIn")}</Text>
+            <Text style={styles.text}>{t("ui.checkIn")}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("CheckOut")}>
-            <Text style={styles.text}>{t("attendance.checkOut")}</Text>
+            <Text style={styles.text}>{t("ui.checkOut")}</Text>
           </TouchableOpacity>
         </>
       )}

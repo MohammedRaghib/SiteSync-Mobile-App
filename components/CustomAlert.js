@@ -2,7 +2,15 @@ import React from "react";
 import { Modal, View, Text, TouchableOpacity } from "react-native";
 
 export default function CustomAlert({ visible, type, message, onClose }) {
-  const backgroundColor = type === "error" ? "#ff4d4d" : "#4CAF50";
+  const colors = {
+    error: "#ff4d4d",
+    warning: "#ffcc00",
+    success: "#4BB543",
+    info: "#2196f3",
+  };
+
+  const backgroundColor = colors[type] || colors.success;
+
 
   return (
     <Modal transparent visible={visible} animationType="fade">

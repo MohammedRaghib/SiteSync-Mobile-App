@@ -104,6 +104,7 @@ const useAttendanceAndChecks = () => {
         `attendance_is_supervisor_check_${isCheckIn ? "in" : "out"}`,
         user.role === "supervisor"
       );
+      formData.append("attendance_national_id_number", faceData?.national_id_number || "");
 
       for (const key in additionalFields) {
         if (additionalFields[key] !== undefined && additionalFields[key] !== null) {
@@ -151,7 +152,7 @@ const useAttendanceAndChecks = () => {
       }
 
       log.info(`✅ Check-${isCheckIn ? "in" : "out"} success`);
-      return { message: `attendance.check${isCheckIn ? "in" : "out"}Success`, success: true };
+      return { message: `ui.check${isCheckIn ? "in" : "out"}Success`, success: true };
     } catch (error) {
       log.error("🚨 Attendance error:", error.message);
       return { message: error.message, success: false };
@@ -186,6 +187,7 @@ const useAttendanceAndChecks = () => {
     CheckInAttendance,
     CheckOutAttendance,
     SpecialReEntry,
+    compressImageIfNeeded,
   };
 };
 

@@ -75,6 +75,10 @@ const LoginScreen = () => {
         ...prevUser,
         ...newUser,
       }));
+      
+      if (role_name.toLowerCase() === "admin" || role_name.toLowerCase() === "manager") {
+        return navigation.navigate("RegisterPerson");
+      }
 
       navigation.navigate("Projects");
     } catch (error) {
