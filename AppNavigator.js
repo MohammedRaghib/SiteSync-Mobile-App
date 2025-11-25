@@ -9,7 +9,6 @@ import CheckInScreen from "./screens/CheckInScreen";
 import CheckOutScreen from "./screens/CheckOutScreen";
 import TaskCheckScreen from "./screens/TaskCheckScreen";
 import SpecialReEntryScreen from "./screens/SpecialReEntryScreen";
-import RegisterPersonScreen from "./screens/RegisterPersonScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +19,6 @@ export default function AppNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Projects" component={Projects} />
-        <Stack.Screen name="RegisterPerson" component={RegisterPersonScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
         <Stack.Screen name="SpecialReEntry" component={SpecialReEntryScreen} />

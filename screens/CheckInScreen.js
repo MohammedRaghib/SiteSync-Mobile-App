@@ -5,7 +5,6 @@ import CameraLocationComponent from "../components/CameraLocationComponent";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
 import CustomAlert from "../components/CustomAlert";
 import useCheckInfo from "../services/UserContext";
-import log from "../components/Logger";
 
 function CheckInScreen() {
   const { t } = useTranslation();
@@ -28,13 +27,11 @@ function CheckInScreen() {
 
   const closeAlert = () => setAlert({ ...alert, visible: false });
 
-  const handlePictureTaken = async (photo, national_id_number) => {
+  const handlePictureTaken = async (photo) => {
     try {
       const send = {
         image: photo.uri,
-        national_id_number: national_id_number || "",
       };
-
       const checkIn = await CheckInAttendance(send);
 
       if (!checkIn?.success){

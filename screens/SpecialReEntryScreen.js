@@ -135,13 +135,13 @@ function SpecialReEntryScreen() {
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
           >
-            <Text style={styles.text}>{t("ui.checkOut")}</Text>
+            <Text style={styles.text}>{t("attendance.checkOut")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
           >
-            <Text style={styles.text}>{t("ui.checkIn")}</Text>
+            <Text style={styles.text}>{t("attendance.checkIn")}</Text>
           </TouchableOpacity>
         </>
       )}

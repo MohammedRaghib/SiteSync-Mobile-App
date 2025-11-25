@@ -166,7 +166,7 @@ function TaskCheckScreen() {
       {user?.role === "supervisor" && (
         <>
           <Text style={styles.title}>
-            {t("ui.supervisorTaskCheck")}
+            {t("attendance.supervisorTaskCheck")}
           </Text>
           <Text style={styles.workerName}>
             {faceData?.name || t("errors.noName")}
@@ -260,14 +260,14 @@ function TaskCheckScreen() {
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
           >
-            <Text style={styles.text}>{t("ui.checkOut")}</Text>
+            <Text style={styles.text}>{t("attendance.checkOut")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
           >
-            <Text style={styles.text}>{t("ui.checkIn")}</Text>
+            <Text style={styles.text}>{t("attendance.checkIn")}</Text>
           </TouchableOpacity>
         </>
       )}

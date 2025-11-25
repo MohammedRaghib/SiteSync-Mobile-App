@@ -2,22 +2,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import useCheckInfo from "../services/UserContext";
-import { useEffect } from "react";
 
 function HomeScreen() {
   const navigation = useNavigation();
   const { user, loggedIn } = useCheckInfo();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      if (user.role === "admin" || user.role === "manager") {
-        navigation.navigate("RegisterPerson");
-      }
-    });
-
-    return unsubscribe;
-  }, [navigation, user]);
 
   return (
     <View style={styles.container}>
@@ -45,21 +34,21 @@ function HomeScreen() {
             style={styles.link}
             onPress={() => navigation.navigate("CheckOut")}
           >
-            <Text style={styles.text}>{t("ui.checkOut")}</Text>
+            <Text style={styles.text}>{t("attendance.checkOut")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
           >
-            <Text style={styles.text}>{t("ui.checkIn")}</Text>
+            <Text style={styles.text}>{t("attendance.checkIn")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.link}
             onPress={() => navigation.navigate("Projects")}
           >
-            <Text style={styles.text}>{t("ui.projects")}</Text>
+            <Text style={styles.text}>{t("attendance.projects")}</Text>
           </TouchableOpacity>
         </>
       )}

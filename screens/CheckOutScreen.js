@@ -7,7 +7,6 @@ import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
 import useFaceRecognition from "../services/useFaceRecog";
 import CustomAlert from "../components/CustomAlert";
-import log from "../components/Logger";
 
 function CheckOutScreen() {
   const { t } = useTranslation();
@@ -32,26 +31,21 @@ function CheckOutScreen() {
 
   const closeAlert = () => setAlert({ ...alert, visible: false });
 
-  const handlePictureTaken = async (photo, national_id_number) => {
-    log.info("User role:", user.role);
+  const handlePictureTaken = async (photo) => {
     try {
       if (user.role === "supervisor") {
-        const data = await recognizeFace(photo.uri, national_id_number);
-        log.info("Face recognition data:", data);
+        const data = await recognizeFace(photo.uri);
 
         if (data.matchFound) {
           navigation.navigate("TaskCheck", {
-            faceData: { ...data.matchedPerson, image: photo.uri, national_id_number },
+            faceData: { ...data.matchedPerson, image: photo.uri },
           });
           return;
-        } else {
-          throw new Error(t("errors.subject_not_found"));
         }
       }
 
       const send = {
         image: photo.uri,
-        national_id_number: national_id_number || "",
       };
 
       const checkOut = await CheckOutAttendance(send);

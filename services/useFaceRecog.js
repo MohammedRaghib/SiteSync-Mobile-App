@@ -10,7 +10,7 @@ const useFaceRecognition = () => {
     const { BACKEND_API_URLS } = useCheckInfo();
     const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
-    const recognizeFace = async (imageUri, national_id_number) => {
+    const recognizeFace = async (imageUri) => {
         log.info("📸 Starting face recognition with image URI:", imageUri);
 
         const requestUrl = BACKEND_API_URL + "check_face/";
@@ -25,7 +25,6 @@ const useFaceRecognition = () => {
                 type: "image/jpeg",
                 name: "photo.jpg",
             });
-            formData.append("national_id_number", national_id_number);
 
             let response;
             try {
