@@ -38,7 +38,7 @@ function CheckInScreen() {
         throw new Error(t(checkIn?.message || "errors.fetchError" ));
       }
 
-      showAlert("success", t(checkIn?.message || "attendance.checkinSuccess"));
+      showAlert("success", t(checkIn?.message || "ui.checkinSuccess"));
     } catch (error) {
       if (error.message.includes("Network request failed")) {
         showAlert("error", t("errors.networkError"));

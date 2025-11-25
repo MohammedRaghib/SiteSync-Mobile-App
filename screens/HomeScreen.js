@@ -34,21 +34,21 @@ function HomeScreen() {
             style={styles.link}
             onPress={() => navigation.navigate("CheckOut")}
           >
-            <Text style={styles.text}>{t("attendance.checkOut")}</Text>
+            <Text style={styles.text}>{t("ui.checkOut")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
           >
-            <Text style={styles.text}>{t("attendance.checkIn")}</Text>
+            <Text style={styles.text}>{t("ui.checkIn")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.link}
             onPress={() => navigation.navigate("Projects")}
           >
-            <Text style={styles.text}>{t("attendance.projects")}</Text>
+            <Text style={styles.text}>{t("ui.projects")}</Text>
           </TouchableOpacity>
         </>
       )}

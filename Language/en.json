@@ -34,9 +34,7 @@
     "decline": "Decline",
     "supervisor": "Supervisor",
     "guard": "Guard",
-    "selectedProject": "Selected Project"
-  },
-  "attendance": {
+    "selectedProject": "Selected Project",
     "checkIn": "Check In",
     "checkOut": "Check Out",
     "projects": "Projects",
