@@ -151,7 +151,7 @@ const useAttendanceAndChecks = () => {
       }
 
       log.info(`✅ Check-${isCheckIn ? "in" : "out"} success`);
-      return { message: `attendance.check${isCheckIn ? "in" : "out"}Success`, success: true };
+      return { message: `ui.check${isCheckIn ? "in" : "out"}Success`, success: true };
     } catch (error) {
       log.error("🚨 Attendance error:", error.message);
       return { message: error.message, success: false };
