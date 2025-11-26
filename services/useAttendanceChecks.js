@@ -186,6 +186,7 @@ const useAttendanceAndChecks = () => {
     CheckInAttendance,
     CheckOutAttendance,
     SpecialReEntry,
+    compressImageIfNeeded,
   };
 };
 

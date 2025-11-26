@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Alert } from "react-native";
 import useCheckInfo from "./UserContext";
+import useAttendanceAndChecks from "./useAttendanceChecks";
 import log from "../components/Logger";
 
 const useFaceRecognition = () => {
     const [matchedWorker, setMatchedWorker] = useState(null);
     const [loading, setLoading] = useState(false);
+    const { compressImageIfNeeded } = useAttendanceAndChecks();
 
     const { BACKEND_API_URLS } = useCheckInfo();
     const BACKEND_API_URL = BACKEND_API_URLS.backend1;
@@ -20,10 +22,15 @@ const useFaceRecognition = () => {
             setMatchedWorker(null);
 
             const formData = new FormData();
+            const optimizedUri = await compressImageIfNeeded(faceData.image);
+            const filename = optimizedUri.split("/").pop();
+            const match = /\.(jpg|jpeg|png)$/i.exec(filename);
+            const type = match ? `image/${match[1]}` : "image/jpeg";
+
             formData.append("image", {
-                uri: imageUri,
-                type: "image/jpeg",
-                name: "photo.jpg",
+                uri: optimizedUri,
+                name: filename,
+                type,
             });
 
             let response;
@@ -33,12 +40,9 @@ const useFaceRecognition = () => {
                 response = await fetch(requestUrl, {
                     method: "POST",
                     body: formData,
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
                 });
             } catch (err) {
-                log.error("❌ Fetch crashed:", err.message, err.stack);
+                log.error("❌ Fetch crashed:", err);
                 return { matchFound: false, error: err.message };
             }
 
