@@ -34,11 +34,12 @@ function CheckInScreen() {
       };
       const checkIn = await CheckInAttendance(send);
 
-      if (!checkIn?.success){
-        throw new Error(t(checkIn?.message || "errors.fetchError" ));
+      if (!checkIn?.success) {
+        throw new Error(t(checkIn?.message || "errors.fetchError"));
       }
-
-      showAlert("success", t(checkIn?.message || "ui.checkinSuccess"));
+      
+      const message = t(checkIn?.message || "ui.checkinSuccess", {name: checkIn.subject_name});
+      showAlert("success", message);
     } catch (error) {
       if (error.message.includes("Network request failed")) {
         showAlert("error", t("errors.networkError"));

@@ -55,7 +55,7 @@ function SpecialReEntryScreen() {
         throw new Error(t(response?.message || "errors.checkinFailure"));
       }
 
-      setAlertMessage(t(response.message || "errors.checkinSuccess"));
+      setAlertMessage(t(response.message || "errors.checkinSuccess", { name: response.subject_name }));
       setAlertType("success");
       setAlertVisible(true);
 

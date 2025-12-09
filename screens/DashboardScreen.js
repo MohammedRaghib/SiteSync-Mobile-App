@@ -1,9 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert } from "react-native";
 import useCheckInfo from "../services/UserContext";
 import log from "../components/Logger";
+import { Ionicons } from "react-native-vector-icons";
+import CustomAlert from "../components/CustomAlert";
 
 const TabButton = ({ title, isActive, onPress }) => (
   <TouchableOpacity
@@ -20,6 +22,7 @@ const DashboardScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
   const { user, loggedIn, BACKEND_API_URLS } = useCheckInfo();
+  const [alert, setAlert] = useState({ visible: false, type: "success", message: "" });
 
   const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
@@ -32,7 +35,7 @@ const DashboardScreen = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const fetchAttendance = async () => {
+  const fetchCheckIns = async () => {
     setLoading(true);
     setErrorMessage("");
     try {
@@ -90,6 +93,68 @@ const DashboardScreen = () => {
     }
   };
 
+  const handleDelete = (id, type) => {
+    const isCheckIn = type === 'checkin';
+    const successMessageKey = isCheckIn ? 'ui.checkinDeleteSuccess' : 'ui.checkoutDeleteSuccess';
+
+    const deleteCheckIn = async () => {
+      setLoading(true);
+      setErrorMessage("");
+      try {
+        const response = await fetch(`${BACKEND_API_URL}delete_attendance/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id,
+            type
+          }),
+        });
+
+        const jsonError = await response.json();
+
+        if (!response.ok) {
+          throw new Error(t("errors." + jsonError.error_type || "errors.serverError"));
+        }
+
+        setAlert({
+          visible: true,
+          type: "success",
+          message: t(successMessageKey),
+        });
+
+        const call_function = type === 'checkin' ? fetchCheckIns : fetchCheckouts;
+        call_function();
+      } catch (error) {
+        log.error(error);
+        setAlert({
+          visible: true,
+          type: "error",
+          message: t(error.message),
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    Alert.alert(
+      t("ui.confirmDeleteTitle"),
+      t("ui.confirmDeleteMessage", { type: t(isCheckIn ? 'ui.checkIn' : 'ui.checkOut') }),
+      [
+        {
+          text: t("ui.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("ui.delete"),
+          style: "destructive",
+          onPress: deleteCheckIn,
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const handleTabChange = (tab) => {
     if (activeTab === tab) return;
@@ -102,14 +167,14 @@ const DashboardScreen = () => {
     } else if (tab === 'checkouts' && CheckoutsData.length === 0) {
       fetchCheckouts();
     } else if (tab === 'attendance' && AttendanceData.length === 0) {
-      fetchAttendance();
+      fetchCheckIns();
     }
   };
 
 
   useEffect(() => {
     if (loggedIn && user?.role === "supervisor") {
-      fetchAttendance();
+      fetchCheckIns();
     }
   }, [loggedIn, user?.role]);
 
@@ -128,7 +193,7 @@ const DashboardScreen = () => {
       if (data.length === 0) return <Text style={styles.noData}>{t("ui.noData")}</Text>;
 
       return data.map((absentee) => (
-        <View key={absentee.id} style={styles.item}>
+        <View key={absentee.id} style={styles.itemContainer}>
           <Text style={styles.name}>{absentee.name}</Text>
         </View>
       ));
@@ -139,17 +204,25 @@ const DashboardScreen = () => {
       if (data.length === 0) return <Text style={styles.noData}>{t("ui.noData")}</Text>;
 
       return data.map((checkout) => (
-        <View key={checkout.subject?.id} style={styles.item}>
-          <Text style={styles.name}>
-            {t("ui.name")} - {checkout.subject?.name}
-          </Text>
-          <Text style={styles.status}>
-            {t("ui.checkedoutby")} {checkout.is_supervisor_checkout ? t("ui.supervisor") : t("ui.guard")} - {new Date(checkout.timestamp).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            })}
-          </Text>
+        <View key={checkout.id} style={styles.itemContainer}>
+          <View style={styles.textDetails}>
+            <Text style={styles.name}>
+              {t("ui.name")} - {checkout.subject?.name}
+            </Text>
+            <Text style={styles.status}>
+              {t("ui.checkedoutby")} {checkout.is_supervisor_checkout ? t("ui.supervisor") : t("ui.guard")} - {new Date(checkout.timestamp).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDelete(checkout.id, 'checkout')}
+          >
+            <Ionicons name="trash-outline" size={24} color="#FF3B30" />
+          </TouchableOpacity>
         </View>
       ));
     }
@@ -158,24 +231,39 @@ const DashboardScreen = () => {
     if (data.length === 0) return <Text style={styles.noData}>{t("ui.noData")}</Text>;
 
     return data.map((attendance) => (
-      <View key={attendance.subject?.id} style={styles.item}>
-        <Text style={styles.name}>
-          {t("ui.name")} - {attendance.subject?.name}
-        </Text>
-        <Text style={styles.status}>
-          {t("ui.checkedinby")} {attendance.is_supervisor_checkin ? t("ui.supervisor") : t("ui.guard")} - {new Date(attendance.timestamp).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          })}
-        </Text>
+      <View key={attendance.id} style={styles.itemContainer}>
+        <View style={styles.textDetails}>
+          <Text style={styles.name}>
+            {t("ui.name")} - {attendance.subject?.name}
+          </Text>
+          <Text style={styles.status}>
+            {t("ui.checkedinby")} {attendance.is_supervisor_checkin ? t("ui.supervisor") : t("ui.guard")} - {new Date(attendance.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            })}
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDelete(attendance.id, 'checkin')}
+        >
+          <Ionicons name="trash-outline" size={24} color="#FF3B30" />
+        </TouchableOpacity>
       </View>
     ));
   };
 
+  const closeAlert = () => setAlert({ visible: false });
 
   return (
     <View style={styles.container}>
+      <CustomAlert
+        visible={alert.visible}
+        type={alert.type}
+        message={alert.message}
+        onClose={closeAlert}
+      />
       {loggedIn && user?.role === "supervisor" && (
         <>
           <Text style={styles.title}>{t("ui.dashboard")}</Text>
@@ -266,7 +354,10 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: "#fff",
   },
-  item: {
+  itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: "#fff",
     padding: 12,
     marginVertical: 8,
@@ -277,6 +368,10 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
+  textDetails: {
+    flex: 1,
+    marginRight: 10,
+  },
   name: {
     fontSize: 16,
     fontWeight: "600",
@@ -286,6 +381,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     color: "#666",
+  },
+  deleteButton: {
+    padding: 5,
+    marginLeft: 10,
   },
   loading: {
     fontSize: 16,

@@ -58,7 +58,8 @@ function CheckOutScreen() {
         throw new Error(t(checkOut?.message || "errors.fetchError"));
       }
 
-      showAlert("success", t(checkOut.message || "attendance.checkoutSuccess"));
+      const message = t(checkOut.message || "attendance.checkoutSuccess", {name: checkOut.subject_name});
+      showAlert("success", message);
     } catch (error) {
       if (error.message.includes("Network request failed")) {
         showAlert("error", t("errors.networkError"));

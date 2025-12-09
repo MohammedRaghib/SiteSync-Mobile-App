@@ -106,7 +106,7 @@ function TaskCheckScreen() {
         throw new Error(t(success?.message || "errors.serverError"));
       }
 
-      showAlert("success", t(success?.message || "attendance.checkoutSuccess"));
+      showAlert("success", t(success?.message || "attendance.checkoutSuccess", { name: success.subject_name }));
 
       setTimeout(() => {
         navigation.navigate("Home");

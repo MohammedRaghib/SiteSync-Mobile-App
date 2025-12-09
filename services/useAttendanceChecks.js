@@ -150,8 +150,10 @@ const useAttendanceAndChecks = () => {
         throw new Error("errors." + (json.error_type || "serverError"));
       }
 
+      let subject_name = json.subject_name || "Unkown Person";
+
       log.info(`✅ Check-${isCheckIn ? "in" : "out"} success`);
-      return { message: `ui.check${isCheckIn ? "in" : "out"}Success`, success: true };
+      return { message: `ui.check${isCheckIn ? "in" : "out"}Success`, subject_name: subject_name, success: true };
     } catch (error) {
       log.error("🚨 Attendance error:", error.message);
       return { message: error.message, success: false };

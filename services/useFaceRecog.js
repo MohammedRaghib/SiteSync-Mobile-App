@@ -22,7 +22,7 @@ const useFaceRecognition = () => {
             setMatchedWorker(null);
 
             const formData = new FormData();
-            const optimizedUri = await compressImageIfNeeded(faceData.image);
+            const optimizedUri = await compressImageIfNeeded(imageUri);
             const filename = optimizedUri.split("/").pop();
             const match = /\.(jpg|jpeg|png)$/i.exec(filename);
             const type = match ? `image/${match[1]}` : "image/jpeg";
