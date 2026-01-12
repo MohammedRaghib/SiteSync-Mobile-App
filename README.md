@@ -7,7 +7,6 @@ SiteSync Mobile App is a cross-platform mobile application for syncing and manag
 ## Table of Contents
 - [Features](#features)
 - [Tech stack](#tech-stack)
-- [Screenshots](#screenshots)
 - [Getting started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Clone and install](#clone-and-install)
@@ -46,10 +45,6 @@ Useful links:
 ### Prerequisites
 - Node.js (LTS recommended) — https://nodejs.org/
 - npm or Yarn
-- Java Development Kit (JDK) 11+ for Android builds
-- Android Studio and Android SDK for Android builds
-- Xcode and macOS for iOS builds (if supporting iOS)
-- Optional: Watchman (macOS) for faster file watching
 
 ### Clone and install
 1. Clone the repo:
@@ -83,18 +78,6 @@ Useful links:
   ```
 Make sure an Android emulator is running or a device is connected.
 
-### Run on iOS (macOS only)
-```bash
-npx react-native run-ios
-```
-Or open `ios/YourApp.xcworkspace` in Xcode and run from there.
-
-Note: If this repository uses Expo, use:
-```bash
-npx expo start
-```
-Check `package.json` for `expo` dependency to confirm.
-
 ## Configuration & Environment
 - Create a `.env` file (if the app expects environment variables) based on `.env.example`:
   ```
@@ -114,19 +97,11 @@ Android (example):
    ```
 3. The AAB/APK will be in `android/app/build/outputs/...`.
 
-iOS (example):
-1. Configure signing in Xcode.
-2. Archive and export from Xcode for App Store / TestFlight.
-
 Refer to React Native official docs for detailed release steps:
 - Android: https://reactnative.dev/docs/signed-apk-android
-- iOS: https://reactnative.dev/docs/publishing-to-app-store
 
 ## Architecture overview
 - JS layer: UI, state management, business logic, network/sync logic
-- Native bridge: Kotlin modules for Android-only functionality (e.g., sensors, background services)
-- Data persistence: local DB (Realm/SQLite/AsyncStorage) + remote sync API
-- Sync engine: conflict resolution and retry logic (adjustable by configuration)
 
 (Adjust the above to reflect actual implementations in the codebase.)
 
