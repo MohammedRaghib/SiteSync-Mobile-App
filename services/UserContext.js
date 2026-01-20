@@ -13,7 +13,7 @@ export function CheckInfoProvider({ children }) {
     projectName: "",
   });
   
-  const [BACKEND_API_URLS, setBACKEND_API_URLS] = useState({
+  const [BACKEND_API_URLS, setBackendUrls] = useState({
     backend1: '',
     backend2: ''
   });
@@ -64,7 +64,7 @@ export function CheckInfoProvider({ children }) {
         throw new Error(t("errors.fetchUrlError"));
       }
 
-      setBACKEND_API_URLS((prevURLs) => ({
+      setBackendUrls((prevURLs) => ({
         ...prevURLs,
         backend1: data.backend1,
         backend2: data.backend2
@@ -89,6 +89,7 @@ export function CheckInfoProvider({ children }) {
         setLoggedIn,
         hasAccess,
         refreshAccessToken,
+        setBackendUrls,
         BACKEND_API_URLS,
       }}
     >

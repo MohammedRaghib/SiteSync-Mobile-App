@@ -19,7 +19,8 @@ import { Theme } from "../constants/Theme";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const { setUser, loggedIn, setLoggedIn, BACKEND_API_URLS } = useCheckInfo();
+  const { setUser, loggedIn, setLoggedIn, BACKEND_API_URLS, setBackendUrls } =
+    useCheckInfo();
   const { t } = useTranslation();
 
   const BACKEND_API_URL = BACKEND_API_URLS.backend1;
@@ -85,7 +86,8 @@ const LoginScreen = () => {
   };
 
   const getExpoPushToken = async () => {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
     if (existingStatus !== "granted") {
@@ -103,6 +105,13 @@ const LoginScreen = () => {
       setErrorMessage(t("errors.expo_token_required"));
       return null;
     }
+  };
+
+  const handleSwitchUrl = () => {
+    setBackendUrls((prevURLs) => ({
+      backend1: prevURLs.backend2,
+      backend2: prevURLs.backend1,
+    }));
   };
 
   const appVersion = Constants.expoConfig.version;
@@ -164,7 +173,9 @@ const LoginScreen = () => {
         </View>
       )}
       <SwitchLanguage />
-      <Text style={styles.versionText}>Version: {appVersion}</Text>
+      <TouchableOpacity onPress={handleSwitchUrl}>
+        <Text style={styles.versionText}>Version: {appVersion}</Text>
+      </TouchableOpacity>
     </>
   );
 };
@@ -236,11 +247,16 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.s4,
     fontSize: 16,
   },
+  footer: {
+    flex: 1,
+    backgroundColor: Theme.colors.backgroundBody,
+    paddingBottom: 20,
+    alignItems: "center",
+  },
   versionText: {
     fontSize: 12,
     color: Theme.colors.textMuted,
     textAlign: "center",
-    marginBottom: 10,
   },
 });
 
