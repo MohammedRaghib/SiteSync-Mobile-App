@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage } from './i18n';
+import { Theme } from '../constants/Theme';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -50,7 +51,14 @@ const SwitchLanguage = () => {
                 style={styles.option}
                 onPress={() => handleSelect(lang.code)}
               >
-                <Text style={styles.optionText}>{lang.label}</Text>
+                <Text
+                  style={[
+                    styles.optionText,
+                    i18n.language === lang.code && styles.selectedOptionText
+                  ]}
+                >
+                  {lang.label}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -63,37 +71,48 @@ const SwitchLanguage = () => {
 const styles = StyleSheet.create({
   dropdownContainer: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    bottom: Theme.spacing.s6,
+    right: Theme.spacing.s4,
     zIndex: 999,
   },
   dropdownButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
+    backgroundColor: Theme.colors.buttonBg,
+    paddingVertical: Theme.spacing.s2,
+    paddingHorizontal: Theme.spacing.s4,
+    borderRadius: Theme.radius.lg,
+    borderWidth: 1,
+    borderColor: Theme.colors.primaryBorder,
   },
   dropdownButtonText: {
-    color: '#fff',
+    color: Theme.colors.backgroundContainer,
     fontSize: 16,
+    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    backgroundColor: Theme.colors.backgroundContainer,
+    padding: Theme.spacing.s6,
+    borderTopLeftRadius: Theme.radius.lg,
+    borderTopRightRadius: Theme.radius.lg,
+    borderWidth: 1,
+    borderColor: Theme.colors.borderDefault,
   },
   option: {
-    paddingVertical: 12,
+    paddingVertical: Theme.spacing.s3,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Theme.colors.borderDefault,
   },
   optionText: {
     fontSize: 16,
-    color: '#007AFF',
+    color: Theme.colors.textBody,
+  },
+  selectedOptionText: {
+    color: Theme.colors.primaryBorder,
+    fontWeight: '700',
   },
 });
 

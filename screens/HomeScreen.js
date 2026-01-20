@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import useCheckInfo from "../services/UserContext";
+import { Theme } from "../constants/Theme";
 
 function HomeScreen() {
   const navigation = useNavigation();
@@ -71,24 +72,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: "5%",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: Theme.colors.backgroundBody,
   },
   link: {
     paddingVertical: 15,
     paddingHorizontal: 20,
-    backgroundColor: "#007AFF",
+    backgroundColor: Theme.colors.buttonBg,
     width: "80%",
     alignItems: "center",
-    borderRadius: 10,
-    marginVertical: 10,
+    borderRadius: Theme.radius.md,
+    marginVertical: Theme.spacing.s2,
+    borderWidth: 1,
+    borderColor: Theme.colors.primaryBorder,
     shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   text: {
-    color: "white",
+    color: "#ffffff",
     fontSize: 18,
     fontWeight: "bold",
   },

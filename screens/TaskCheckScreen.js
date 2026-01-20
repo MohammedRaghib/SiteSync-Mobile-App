@@ -13,6 +13,7 @@ import CheckBox from "@react-native-community/checkbox";
 import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
 import CustomAlert from "../components/CustomAlert";
+import { Theme } from "../constants/Theme";
 
 function TaskCheckScreen() {
   const route = useRoute();
@@ -106,7 +107,12 @@ function TaskCheckScreen() {
         throw new Error(t(success?.message || "errors.serverError"));
       }
 
-      showAlert("success", t(success?.message || "attendance.checkoutSuccess", { name: success.subject_name }));
+      showAlert(
+        "success",
+        t(success?.message || "attendance.checkoutSuccess", {
+          name: success.subject_name,
+        })
+      );
 
       setTimeout(() => {
         navigation.navigate("Home");
@@ -165,12 +171,14 @@ function TaskCheckScreen() {
 
       {user?.role === "supervisor" && (
         <>
-          <Text style={styles.title}>
-            {t("ui.supervisorTaskCheck")}
-          </Text>
-          <Text style={styles.workerName}>
-            {faceData?.name || t("errors.noName")}
-          </Text>
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>{t("ui.supervisorTaskCheck")}</Text>
+            <View style={styles.workerBadge}>
+              <Text style={styles.workerName}>
+                {faceData?.name || t("errors.noName")}
+              </Text>
+            </View>
+          </View>
 
           <View style={styles.globalCheckboxes}>
             <TouchableOpacity
@@ -180,8 +188,14 @@ function TaskCheckScreen() {
               <CheckBox
                 value={state.allTasksCompleted && state.allEquipmentReturned}
                 onValueChange={toggleSelectAll}
+                tintColors={{
+                  true: Theme.colors.primaryBorder,
+                  false: Theme.colors.borderDefault,
+                }}
               />
-              <Text style={styles.checkboxLabel}>{t("ui.selectAll")}</Text>
+              <Text style={[styles.checkboxLabel, { fontWeight: "bold" }]}>
+                {t("ui.selectAll")}
+              </Text>
             </TouchableOpacity>
 
             <View style={styles.inlineCheckboxes}>
@@ -192,6 +206,10 @@ function TaskCheckScreen() {
                 <CheckBox
                   value={state.allTasksCompleted}
                   onValueChange={() => toggleSelection("allTasks")}
+                  tintColors={{
+                    true: Theme.colors.primaryBorder,
+                    false: Theme.colors.borderDefault,
+                  }}
                 />
                 <Text style={styles.checkboxLabel}>
                   {t("ui.allTasksCompleted")}
@@ -205,6 +223,10 @@ function TaskCheckScreen() {
                 <CheckBox
                   value={state.allEquipmentReturned}
                   onValueChange={() => toggleSelection("allEquipment")}
+                  tintColors={{
+                    true: Theme.colors.primaryBorder,
+                    false: Theme.colors.borderDefault,
+                  }}
                 />
                 <Text style={styles.checkboxLabel}>
                   {t("ui.allEquipmentReturned")}
@@ -217,7 +239,7 @@ function TaskCheckScreen() {
             {state.loading ? (
               <ActivityIndicator
                 size="large"
-                color="#007bff"
+                color={Theme.colors.primaryBorder}
                 style={styles.loadingIndicator}
               />
             ) : state.error ? (
@@ -260,14 +282,14 @@ function TaskCheckScreen() {
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
           >
-            <Text style={styles.text}>{t("ui.checkOut")}</Text>
+            <Text style={styles.linkText}>{t("ui.checkOut")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.link}
             onPress={() => navigation.navigate("CheckIn")}
           >
-            <Text style={styles.text}>{t("ui.checkIn")}</Text>
+            <Text style={styles.linkText}>{t("ui.checkIn")}</Text>
           </TouchableOpacity>
         </>
       )}
@@ -277,7 +299,7 @@ function TaskCheckScreen() {
           style={styles.link}
           onPress={() => navigation.navigate("Login")}
         >
-          <Text style={styles.text}>{t("ui.login")}</Text>
+          <Text style={styles.linkText}>{t("ui.login")}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -287,54 +309,61 @@ function TaskCheckScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f7fa",
-    padding: 20,
-    paddingTop: 40,
+    backgroundColor: Theme.colors.backgroundBody,
+    padding: Theme.spacing.s4,
+  },
+  headerContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginBottom: Theme.spacing.s4,
+    paddingTop: 10,
   },
   title: {
     fontSize: 24,
-    fontWeight: "700",
-    color: "#333",
+    fontWeight: "bold",
+    color: Theme.colors.textHeader,
     textAlign: "center",
-    marginBottom: 10,
-    paddingHorizontal: 20,
+    marginBottom: Theme.spacing.s2,
+  },
+  workerBadge: {
+    backgroundColor: Theme.colors.secondaryLight,
+    paddingHorizontal: Theme.spacing.s4,
+    paddingVertical: Theme.spacing.s1,
+    borderRadius: Theme.radius.sm,
+    borderWidth: 1,
+    borderColor: Theme.colors.secondaryBorder,
   },
   workerName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
-    color: "#007bff",
+    color: Theme.colors.primaryBorder,
     textAlign: "center",
-    marginBottom: 25,
   },
   globalCheckboxes: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 3,
+    backgroundColor: Theme.colors.backgroundContainer,
+    borderRadius: Theme.radius.md,
+    padding: Theme.spacing.s3,
+    marginBottom: Theme.spacing.s4,
+    borderWidth: 1,
+    borderColor: Theme.colors.borderDefault,
+    elevation: 2,
   },
   inlineCheckboxes: {
     flexDirection: "column",
-    justifyContent: "space-evenly",
-    marginTop: 15,
+    marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#eee",
+    borderTopColor: Theme.colors.borderDefault,
   },
   checkboxOption: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
-    borderColor: "#0c0b0bff",
+    marginBottom: 8,
   },
   checkboxLabel: {
     fontSize: 16,
     marginLeft: 8,
-    color: "#555",
+    color: Theme.colors.textBody,
   },
   scrollViewContent: {
     flex: 1,
@@ -344,71 +373,64 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: "#dc3545",
+    color: Theme.colors.dangerBorder,
     textAlign: "center",
     marginTop: 30,
     fontWeight: "bold",
   },
   noDataText: {
     fontSize: 16,
-    color: "#888",
+    color: Theme.colors.textMuted,
     textAlign: "center",
     marginTop: 30,
   },
   taskCard: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 3,
+    backgroundColor: Theme.colors.backgroundContainer,
+    borderRadius: Theme.radius.md,
+    padding: Theme.spacing.s3,
+    marginBottom: Theme.spacing.s3,
+    borderWidth: 1,
+    borderColor: Theme.colors.borderDefault,
+    elevation: 2,
   },
   taskName: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#444",
-    marginBottom: 10,
+    color: Theme.colors.textHeader,
+    marginBottom: Theme.spacing.s2,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    paddingBottom: 8,
+    borderBottomColor: Theme.colors.backgroundBody,
+    paddingBottom: 4,
   },
   equipmentHeader: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#666",
-    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: "600",
+    color: Theme.colors.textParagraph,
+    marginBottom: 4,
   },
   equipmentItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 5,
-    paddingLeft: 10,
+    paddingVertical: 2,
+    paddingLeft: Theme.spacing.s2,
   },
   equipmentName: {
-    fontSize: 15,
-    color: "#555",
+    fontSize: 14,
+    color: Theme.colors.textBody,
   },
   noEquipmentText: {
     fontSize: 14,
-    color: "#888",
+    color: Theme.colors.textMuted,
     fontStyle: "italic",
-    paddingLeft: 10,
+    paddingLeft: Theme.spacing.s2,
   },
   submitButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: Theme.colors.buttonBg,
     paddingVertical: 15,
-    borderRadius: 25,
+    borderRadius: Theme.radius.lg,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
-    shadowColor: "#007bff",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: Theme.colors.primaryBorder,
   },
   submitButtonText: {
     color: "#fff",
@@ -416,15 +438,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   disabledButton: {
-    backgroundColor: "#a0c7ff",
-    shadowOpacity: 0,
-    elevation: 0,
+    backgroundColor: Theme.colors.primaryLight,
+    opacity: 0.6,
   },
   backButton: {
     marginTop: 20,
-    backgroundColor: "#007bff",
+    backgroundColor: Theme.colors.buttonBg,
     padding: 12,
-    borderRadius: 10,
+    borderRadius: Theme.radius.md,
     alignItems: "center",
   },
   backButtonText: {
@@ -432,12 +453,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   link: {
-    marginTop: 15,
+    paddingVertical: 12,
+    backgroundColor: Theme.colors.primaryLight,
     alignItems: "center",
+    borderRadius: Theme.radius.md,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: Theme.colors.borderDefault,
   },
-  text: {
-    color: "#007bff",
+  linkText: {
+    color: Theme.colors.textHeader,
     fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

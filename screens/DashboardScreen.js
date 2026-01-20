@@ -1,15 +1,26 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 import useCheckInfo from "../services/UserContext";
 import log from "../components/Logger";
 import { Ionicons } from "react-native-vector-icons";
 import CustomAlert from "../components/CustomAlert";
+import { Theme } from "../constants/Theme";
 
 const TabButton = ({ title, isActive, onPress }) => (
   <TouchableOpacity
-    style={[styles.tabButton, isActive && styles.activeTabButton]}
+    style={[
+      styles.tabButton,
+      isActive ? styles.activeTabButton : styles.inactiveTabButton,
+    ]}
     onPress={onPress}
   >
     <Text style={[styles.tabText, isActive && styles.activeTabText]}>
@@ -22,11 +33,15 @@ const DashboardScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
   const { user, loggedIn, BACKEND_API_URLS } = useCheckInfo();
-  const [alert, setAlert] = useState({ visible: false, type: "success", message: "" });
+  const [alert, setAlert] = useState({
+    visible: false,
+    type: "success",
+    message: "",
+  });
 
   const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
-  const [activeTab, setActiveTab] = useState('attendance');
+  const [activeTab, setActiveTab] = useState("attendance");
 
   const [AttendanceData, setAttendanceData] = useState([]);
   const [AbsenteesData, setAbsenteesData] = useState([]);
@@ -39,7 +54,9 @@ const DashboardScreen = () => {
     setLoading(true);
     setErrorMessage("");
     try {
-      const response = await fetch(`${BACKEND_API_URL}supervisor_dashboard?supervisor_id=${user?.id}&project_id=${user?.projectId}`);
+      const response = await fetch(
+        `${BACKEND_API_URL}supervisor_dashboard?supervisor_id=${user?.id}&project_id=${user?.projectId}`
+      );
       if (!response.ok) {
         const jsonError = await response.json();
         throw new Error(t("errors." + jsonError.error_type || "fetchError"));
@@ -57,8 +74,9 @@ const DashboardScreen = () => {
     setLoading(true);
     setErrorMessage("");
     try {
-      const response = await fetch(`${BACKEND_API_URL}project_absentees?supervisor_id=${user?.id}&project_id=${user?.projectId}`);
-
+      const response = await fetch(
+        `${BACKEND_API_URL}project_absentees?supervisor_id=${user?.id}&project_id=${user?.projectId}`
+      );
       if (!response.ok) {
         const jsonError = await response.json();
         throw new Error(t("errors." + jsonError.error_type || "fetchError"));
@@ -76,13 +94,13 @@ const DashboardScreen = () => {
     setLoading(true);
     setErrorMessage("");
     try {
-      const response = await fetch(`${BACKEND_API_URL}project_checkouts?supervisor_id=${user?.id}&project_id=${user?.projectId}`);
-
+      const response = await fetch(
+        `${BACKEND_API_URL}project_checkouts?supervisor_id=${user?.id}&project_id=${user?.projectId}`
+      );
       if (!response.ok) {
         const jsonError = await response.json();
         throw new Error(t("errors." + jsonError.error_type || "fetchError"));
       }
-
       const json = await response.json();
       setCheckoutsData(json.data || []);
     } catch (error) {
@@ -94,37 +112,33 @@ const DashboardScreen = () => {
   };
 
   const handleDelete = (id, type) => {
-    const isCheckIn = type === 'checkin';
-    const successMessageKey = isCheckIn ? 'ui.checkinDeleteSuccess' : 'ui.checkoutDeleteSuccess';
+    const isCheckIn = type === "checkin";
+    const successMessageKey = isCheckIn
+      ? "ui.checkinDeleteSuccess"
+      : "ui.checkoutDeleteSuccess";
 
     const deleteCheckIn = async () => {
       setLoading(true);
       setErrorMessage("");
       try {
         const response = await fetch(`${BACKEND_API_URL}delete_attendance/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            id,
-            type
-          }),
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, type }),
         });
-
         const jsonError = await response.json();
-
         if (!response.ok) {
-          throw new Error(t("errors." + jsonError.error_type || "errors.serverError"));
+          throw new Error(
+            t("errors." + jsonError.error_type || "errors.serverError")
+          );
         }
-
         setAlert({
           visible: true,
           type: "success",
           message: t(successMessageKey),
         });
-
-        const call_function = type === 'checkin' ? fetchCheckIns : fetchCheckouts;
+        const call_function =
+          type === "checkin" ? fetchCheckIns : fetchCheckouts;
         call_function();
       } catch (error) {
         log.error(error);
@@ -136,21 +150,16 @@ const DashboardScreen = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     Alert.alert(
       t("ui.confirmDeleteTitle"),
-      t("ui.confirmDeleteMessage", { type: t(isCheckIn ? 'ui.checkIn' : 'ui.checkOut') }),
+      t("ui.confirmDeleteMessage", {
+        type: t(isCheckIn ? "ui.checkIn" : "ui.checkOut"),
+      }),
       [
-        {
-          text: t("ui.cancel"),
-          style: "cancel",
-        },
-        {
-          text: t("ui.delete"),
-          style: "destructive",
-          onPress: deleteCheckIn,
-        },
+        { text: t("ui.cancel"), style: "cancel" },
+        { text: t("ui.delete"), style: "destructive", onPress: deleteCheckIn },
       ],
       { cancelable: true }
     );
@@ -158,19 +167,14 @@ const DashboardScreen = () => {
 
   const handleTabChange = (tab) => {
     if (activeTab === tab) return;
-
     setActiveTab(tab);
-    setErrorMessage('');
-
-    if (tab === 'absentees' && AbsenteesData.length === 0) {
-      fetchAbsentees();
-    } else if (tab === 'checkouts' && CheckoutsData.length === 0) {
+    setErrorMessage("");
+    if (tab === "absentees" && AbsenteesData.length === 0) fetchAbsentees();
+    else if (tab === "checkouts" && CheckoutsData.length === 0)
       fetchCheckouts();
-    } else if (tab === 'attendance' && AttendanceData.length === 0) {
+    else if (tab === "attendance" && AttendanceData.length === 0)
       fetchCheckIns();
-    }
   };
-
 
   useEffect(() => {
     if (loggedIn && user?.role === "supervisor") {
@@ -178,39 +182,36 @@ const DashboardScreen = () => {
     }
   }, [loggedIn, user?.role]);
 
-
   const renderContent = () => {
-    if (loading) {
-      return <Text style={styles.loading}>{t("ui.loading")}</Text>;
-    }
+    if (loading) return <Text style={styles.loading}>{t("ui.loading")}</Text>;
+    if (errorMessage) return <Text style={styles.error}>{errorMessage}</Text>;
 
-    if (errorMessage) {
-      return <Text style={styles.error}>{errorMessage}</Text>;
-    }
-
-    if (activeTab === 'absentees') {
-      const data = AbsenteesData;
-      if (data.length === 0) return <Text style={styles.noData}>{t("ui.noData")}</Text>;
-
-      return data.map((absentee) => (
+    if (activeTab === "absentees") {
+      if (AbsenteesData.length === 0)
+        return <Text style={styles.noData}>{t("ui.noData")}</Text>;
+      return AbsenteesData.map((absentee) => (
         <View key={absentee.id} style={styles.itemContainer}>
           <Text style={styles.name}>{absentee.name}</Text>
         </View>
       ));
     }
 
-    if (activeTab === 'checkouts') {
-      const data = CheckoutsData;
-      if (data.length === 0) return <Text style={styles.noData}>{t("ui.noData")}</Text>;
-
-      return data.map((checkout) => (
+    if (activeTab === "checkouts") {
+      if (CheckoutsData.length === 0)
+        return <Text style={styles.noData}>{t("ui.noData")}</Text>;
+      return CheckoutsData.map((checkout) => (
         <View key={checkout.id} style={styles.itemContainer}>
           <View style={styles.textDetails}>
             <Text style={styles.name}>
               {t("ui.name")} - {checkout.subject?.name}
             </Text>
             <Text style={styles.status}>
-              {t("ui.checkedoutby")} {checkout.is_supervisor_checkout ? t("ui.supervisor") : t("ui.guard")} - {new Date(checkout.timestamp).toLocaleTimeString([], {
+              {t("ui.checkedoutby")}{" "}
+              {checkout.is_supervisor_checkout
+                ? t("ui.supervisor")
+                : t("ui.guard")}{" "}
+              -{" "}
+              {new Date(checkout.timestamp).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true,
@@ -219,25 +220,33 @@ const DashboardScreen = () => {
           </View>
           <TouchableOpacity
             style={styles.deleteButton}
-            onPress={() => handleDelete(checkout.id, 'checkout')}
+            onPress={() => handleDelete(checkout.id, "checkout")}
           >
-            <Ionicons name="trash-outline" size={24} color="#FF3B30" />
+            <Ionicons
+              name="trash-outline"
+              size={24}
+              color={Theme.colors.dangerBorder}
+            />
           </TouchableOpacity>
         </View>
       ));
     }
 
-    const data = AttendanceData;
-    if (data.length === 0) return <Text style={styles.noData}>{t("ui.noData")}</Text>;
-
-    return data.map((attendance) => (
+    if (AttendanceData.length === 0)
+      return <Text style={styles.noData}>{t("ui.noData")}</Text>;
+    return AttendanceData.map((attendance) => (
       <View key={attendance.id} style={styles.itemContainer}>
         <View style={styles.textDetails}>
           <Text style={styles.name}>
             {t("ui.name")} - {attendance.subject?.name}
           </Text>
           <Text style={styles.status}>
-            {t("ui.checkedinby")} {attendance.is_supervisor_checkin ? t("ui.supervisor") : t("ui.guard")} - {new Date(attendance.timestamp).toLocaleTimeString([], {
+            {t("ui.checkedinby")}{" "}
+            {attendance.is_supervisor_checkin
+              ? t("ui.supervisor")
+              : t("ui.guard")}{" "}
+            -{" "}
+            {new Date(attendance.timestamp).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
               hour12: true,
@@ -246,15 +255,17 @@ const DashboardScreen = () => {
         </View>
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => handleDelete(attendance.id, 'checkin')}
+          onPress={() => handleDelete(attendance.id, "checkin")}
         >
-          <Ionicons name="trash-outline" size={24} color="#FF3B30" />
+          <Ionicons
+            name="trash-outline"
+            size={24}
+            color={Theme.colors.dangerBorder}
+          />
         </TouchableOpacity>
       </View>
     ));
   };
-
-  const closeAlert = () => setAlert({ visible: false });
 
   return (
     <View style={styles.container}>
@@ -262,27 +273,26 @@ const DashboardScreen = () => {
         visible={alert.visible}
         type={alert.type}
         message={alert.message}
-        onClose={closeAlert}
+        onClose={() => setAlert({ visible: false })}
       />
       {loggedIn && user?.role === "supervisor" && (
         <>
           <Text style={styles.title}>{t("ui.dashboard")}</Text>
-
           <View style={styles.tabBar}>
             <TabButton
               title={t("ui.checkIn")}
-              isActive={activeTab === 'attendance'}
-              onPress={() => handleTabChange('attendance')}
+              isActive={activeTab === "attendance"}
+              onPress={() => handleTabChange("attendance")}
             />
             <TabButton
               title={t("ui.checkOut")}
-              isActive={activeTab === 'checkouts'}
-              onPress={() => handleTabChange('checkouts')}
+              isActive={activeTab === "checkouts"}
+              onPress={() => handleTabChange("checkouts")}
             />
             <TabButton
               title={t("ui.absentees")}
-              isActive={activeTab === 'absentees'}
-              onPress={() => handleTabChange('absentees')}
+              isActive={activeTab === "absentees"}
+              onPress={() => handleTabChange("absentees")}
             />
           </View>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -293,17 +303,26 @@ const DashboardScreen = () => {
 
       {loggedIn && user?.role === "guard" && (
         <>
-          <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("CheckIn")}>
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() => navigation.navigate("CheckIn")}
+          >
             <Text style={styles.text}>{t("ui.checkIn")}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("CheckOut")}>
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() => navigation.navigate("CheckOut")}
+          >
             <Text style={styles.text}>{t("ui.checkOut")}</Text>
           </TouchableOpacity>
         </>
       )}
 
       {!loggedIn && (
-        <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("Login")}>
+        <TouchableOpacity
+          style={styles.link}
+          onPress={() => navigation.navigate("Login")}
+        >
           <Text style={styles.text}>{t("ui.login")}</Text>
         </TouchableOpacity>
       )}
@@ -314,8 +333,8 @@ const DashboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f4f4",
-    padding: 20,
+    backgroundColor: Theme.colors.backgroundBody,
+    padding: Theme.spacing.s4,
   },
   scrollContainer: {
     paddingBottom: 100,
@@ -323,95 +342,92 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: Theme.spacing.s2,
     textAlign: "center",
+    color: Theme.colors.textHeader,
   },
   tabBar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: Theme.spacing.s4,
   },
   tabButton: {
     flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 5,
     marginHorizontal: 4,
-    borderRadius: 20,
-    backgroundColor: '#E0E0E0',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: Theme.radius.lg,
+    alignItems: "center",
+    justifyContent: "center",
     minHeight: 40,
+    borderWidth: 1,
   },
   activeTabButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: Theme.colors.buttonBg,
+    borderColor: Theme.colors.primaryBorder,
+  },
+  inactiveTabButton: {
+    backgroundColor: Theme.colors.primaryLight,
+    borderColor: Theme.colors.borderDefault,
   },
   tabText: {
-    color: "#444",
+    color: Theme.colors.textBody,
     fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
   },
   activeTabText: {
-    color: "#fff",
+    color: "#ffffff",
   },
   itemContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: "#fff",
-    padding: 12,
-    marginVertical: 8,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: Theme.colors.backgroundContainer,
+    padding: Theme.spacing.s3,
+    marginVertical: 6,
+    borderRadius: Theme.radius.md,
+    borderWidth: 1,
+    borderColor: Theme.colors.borderDefault,
+    elevation: 2,
   },
   textDetails: {
     flex: 1,
-    marginRight: 10,
   },
   name: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 4,
+    color: Theme.colors.textHeader,
+    marginBottom: 2,
   },
   status: {
     fontSize: 14,
-    fontWeight: "400",
-    color: "#666",
+    color: Theme.colors.textParagraph,
   },
   deleteButton: {
     padding: 5,
-    marginLeft: 10,
   },
   loading: {
     fontSize: 16,
-    fontStyle: "italic",
-    color: "#666",
+    color: Theme.colors.textMuted,
     textAlign: "center",
     marginTop: 20,
   },
   error: {
     fontSize: 16,
-    color: "red",
+    color: Theme.colors.dangerBorder,
     textAlign: "center",
     marginVertical: 10,
   },
   noData: {
     fontSize: 16,
-    fontStyle: "italic",
-    color: "#666",
+    color: Theme.colors.textMuted,
     textAlign: "center",
     marginTop: 20,
   },
   link: {
     paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: "#007AFF",
+    backgroundColor: Theme.colors.buttonBg,
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: Theme.radius.md,
     marginVertical: 10,
   },
   text: {

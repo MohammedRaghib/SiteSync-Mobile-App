@@ -4,6 +4,7 @@ import * as Location from "expo-location";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useTranslation } from "react-i18next";
+import { Theme } from "../constants/Theme";
 
 const CameraLocationComponent = ({ onPictureTaken }) => {
   const { t } = useTranslation();
@@ -16,13 +17,13 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
   const requestBothPermissions = async () => {
     const camPermission = await requestCameraPermission();
     if (!camPermission.granted) {
-      Alert.alert("Camera access is required!");
+      Alert.alert(t("ui.error"), "Camera access is required!");
       return;
     }
 
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Location access is required!");
+      Alert.alert(t("ui.error"), "Location access is required!");
       return;
     }
 
@@ -44,7 +45,7 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
         const photo = await cameraRef.current.takePictureAsync();
         await onPictureTaken(photo);
       } catch (error) {
-        Alert.alert("An error occurred, please try again.");
+        Alert.alert(t("ui.error"), "An error occurred, please try again.");
       } finally {
         setLoading(false);
       }
@@ -54,6 +55,7 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
   if (!cameraPermission?.granted || !locationPermissionGranted) {
     return (
       <View style={styles.permissionContainer}>
+        <Icon name="security" size={64} color={Theme.colors.primaryBorder} />
         <Text style={styles.permissionText}>{t("ui.AllPermissions")}</Text>
         <TouchableOpacity onPress={requestBothPermissions} style={styles.button}>
           <Text style={styles.buttonText}>{t("ui.grantPermission")}</Text>
@@ -67,7 +69,7 @@ const CameraLocationComponent = ({ onPictureTaken }) => {
       <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
         {loading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#fff" />
+            <ActivityIndicator size="large" color={Theme.colors.backgroundContainer} />
           </View>
         )}
 
@@ -106,26 +108,27 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: "space-between",
-    paddingVertical: 30,
+    paddingVertical: Theme.spacing.s6,
   },
   infoText: {
     textAlign: "center",
     fontSize: 18,
     color: "#fff",
-    backgroundColor: "rgba(0,0,0,0.3)",
-    paddingVertical: 8,
-    marginHorizontal: 20,
-    borderRadius: 8,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingVertical: Theme.spacing.s2,
+    marginHorizontal: Theme.spacing.s4,
+    borderRadius: Theme.radius.md,
+    overflow: 'hidden',
   },
   bottomControls: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingBottom: 20,
+    paddingBottom: Theme.spacing.s6,
   },
   flipButton: {
     backgroundColor: "rgba(0,0,0,0.4)",
-    padding: 10,
+    padding: Theme.spacing.s2,
     borderRadius: 50,
   },
   captureOuter: {
@@ -150,27 +153,30 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    padding: Theme.spacing.s6,
+    backgroundColor: Theme.colors.backgroundBody,
   },
   permissionText: {
     fontSize: 18,
-    padding: 10,
-    marginBottom: 20,
+    padding: Theme.spacing.s2,
+    marginBottom: Theme.spacing.s4,
     textAlign: "center",
-    color: "#020101ff",
+    color: Theme.colors.textHeader,
   },
   button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 5,
+    backgroundColor: Theme.colors.buttonBg,
+    paddingVertical: Theme.spacing.s3,
+    paddingHorizontal: Theme.spacing.s6,
+    borderRadius: Theme.radius.md,
   },
   buttonText: {
-    color: "#fff",
+    color: Theme.colors.backgroundContainer,
     fontSize: 16,
+    fontWeight: "bold",
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
     zIndex: 10,

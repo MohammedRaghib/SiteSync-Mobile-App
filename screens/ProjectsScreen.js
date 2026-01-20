@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, ScrollView, View } from "react-nati
 import log from "../components/Logger";
 import { useTranslation } from "react-i18next";
 import useCheckInfo from "../services/UserContext";
+import { Theme } from "../constants/Theme";
 
 function Projects() {
     const navigation = useNavigation();
@@ -53,11 +54,17 @@ function Projects() {
 
     const renderProjectList = () => (
         <>
-            {user?.projectId && (
-                <Text style={styles.title}>
-                    {t("ui.selectedProject")}: {user.projectName}
-                </Text>
-            )}
+            <View style={styles.headerContainer}>
+                <Text style={styles.title}>{t("ui.projects")}</Text>
+                {user?.projectId && (
+                    <View style={styles.selectedBadge}>
+                        <Text style={styles.selectedText}>
+                            {t("ui.selectedProject")}: {user.projectName}
+                        </Text>
+                    </View>
+                )}
+            </View>
+            
             {projects.map((p) => (
                 <TouchableOpacity
                     key={p.id}
@@ -95,50 +102,69 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: "5%",
-        backgroundColor: "#f5f5f5",
+        paddingHorizontal: Theme.spacing.s4,
+        backgroundColor: Theme.colors.backgroundBody,
+    },
+    headerContainer: {
+        width: "100%",
+        alignItems: "center",
+        marginBottom: Theme.spacing.s6,
     },
     title: {
-        fontSize: 22,
+        fontSize: 28,
+        fontWeight: "bold",
+        color: Theme.colors.textHeader,
+        marginBottom: Theme.spacing.s2,
+    },
+    selectedBadge: {
+        backgroundColor: Theme.colors.secondaryLight,
+        paddingHorizontal: Theme.spacing.s3,
+        paddingVertical: Theme.spacing.s1,
+        borderRadius: Theme.radius.sm,
+        borderWidth: 1,
+        borderColor: Theme.colors.secondaryBorder,
+    },
+    selectedText: {
+        fontSize: 14,
+        color: Theme.colors.primaryBorder,
         fontWeight: "600",
-        marginBottom: 20,
-        textAlign: "center",
     },
     link: {
         paddingVertical: 15,
         paddingHorizontal: 20,
-        backgroundColor: "#007AFF",
-        width: "80%",
+        backgroundColor: Theme.colors.buttonBg,
+        width: "90%",
         alignItems: "center",
-        borderRadius: 10,
-        marginVertical: 10,
+        borderRadius: Theme.radius.md,
+        marginVertical: Theme.spacing.s2,
+        borderWidth: 1,
+        borderColor: Theme.colors.primaryBorder,
         shadowColor: "#000",
-        shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 5,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     text: {
-        color: "white",
+        color: "#ffffff",
         fontSize: 18,
         fontWeight: "bold",
     },
     error: {
         fontSize: 16,
-        color: "red",
+        color: Theme.colors.dangerBorder,
         textAlign: "center",
         marginVertical: 10,
     },
     noData: {
         fontSize: 16,
-        fontStyle: "italic",
-        color: "#666",
+        color: Theme.colors.textMuted,
         textAlign: "center",
     },
     loading: {
         fontSize: 16,
         textAlign: "center",
-        color: "#333",
+        color: Theme.colors.textBody,
     },
 });
 

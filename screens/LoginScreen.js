@@ -15,6 +15,7 @@ import SwitchLanguage from "../Language/SwitchLanguage";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import log from "../components/Logger";
+import { Theme } from "../constants/Theme";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -38,20 +39,18 @@ const LoginScreen = () => {
     setLoading(true);
     try {
       const expoToken = await getExpoPushToken();
-      
-      log.info("Posting login request to URL: ", BACKEND_API_URL);
+
       const userResponse = await fetch(`${BACKEND_API_URL}login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: username.trim(),
           password,
-          expo_token: expoToken
-        })
+          expo_token: expoToken,
+        }),
       });
 
       const rawText = await userResponse.text();
-      log.info("📩 Raw Response Text", rawText);
 
       let data;
       try {
@@ -115,7 +114,7 @@ const LoginScreen = () => {
           <TextInput
             style={styles.input}
             placeholder={t("auth.username")}
-            placeholderTextColor={"black"}
+            placeholderTextColor={Theme.colors.textMuted}
             value={username}
             onChangeText={setUsername}
           />
@@ -124,7 +123,7 @@ const LoginScreen = () => {
             <TextInput
               style={styles.passwordInput}
               placeholder={t("auth.password")}
-              placeholderTextColor={"black"}
+              placeholderTextColor={Theme.colors.textMuted}
               secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
@@ -133,7 +132,7 @@ const LoginScreen = () => {
               <Ionicons
                 name={showPassword ? "eye-off" : "eye"}
                 size={24}
-                color="black"
+                color={Theme.colors.textBody}
                 style={styles.eyeIcon}
               />
             </TouchableOpacity>
@@ -155,7 +154,7 @@ const LoginScreen = () => {
         </View>
       ) : (
         <View style={styles.container}>
-          <Text>{t("auth.alreadyLoggedIn")}</Text>
+          <Text style={styles.alreadyText}>{t("auth.alreadyLoggedIn")}</Text>
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("Home")}
@@ -175,62 +174,71 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
-    backgroundColor: "white",
+    padding: Theme.spacing.s6,
+    backgroundColor: Theme.colors.backgroundBody,
   },
   input: {
     width: "80%",
-    height: 45,
+    height: 48,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
+    borderColor: Theme.colors.borderDefault,
+    borderRadius: Theme.radius.md,
     paddingHorizontal: 15,
     fontSize: 16,
-    marginBottom: 15,
-    color: "black",
+    marginBottom: Theme.spacing.s4,
+    color: Theme.colors.textBody,
+    backgroundColor: Theme.colors.backgroundContainer,
   },
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "80%",
-    height: 45,
+    height: 48,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
+    borderColor: Theme.colors.borderDefault,
+    borderRadius: Theme.radius.md,
     paddingHorizontal: 10,
-    marginBottom: 15,
+    marginBottom: Theme.spacing.s4,
+    backgroundColor: Theme.colors.backgroundContainer,
   },
   passwordInput: {
     flex: 1,
     height: "100%",
-    color: "black",
+    color: Theme.colors.textBody,
     fontSize: 16,
   },
   eyeIcon: {
     marginLeft: 8,
-    zIndex: 10
+    zIndex: 10,
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: Theme.colors.buttonBg,
     padding: 12,
-    borderRadius: 10,
+    borderRadius: Theme.radius.md,
     width: "80%",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: Theme.spacing.s2,
+    borderWidth: 1,
+    borderColor: Theme.colors.primaryBorder,
   },
   buttonText: {
-    color: "#fff",
+    color: "#ffffff",
     fontSize: 18,
     fontWeight: "bold",
   },
   error: {
-    color: "red",
+    color: Theme.colors.dangerBorder,
     fontSize: 14,
     marginTop: 10,
   },
+  alreadyText: {
+    color: Theme.colors.textBody,
+    marginBottom: Theme.spacing.s4,
+    fontSize: 16,
+  },
   versionText: {
     fontSize: 12,
-    color: "#888",
+    color: Theme.colors.textMuted,
     textAlign: "center",
     marginBottom: 10,
   },

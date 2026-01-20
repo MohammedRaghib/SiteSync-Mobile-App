@@ -1,10 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
 import CustomAlert from "../components/CustomAlert";
+import { Theme } from "../constants/Theme";
 
 function SpecialReEntryScreen() {
   const navigation = useNavigation();
@@ -25,7 +32,9 @@ function SpecialReEntryScreen() {
     setLoading(true);
     setErrorMessage("");
     try {
-      const response = await fetch(`${BACKEND_API_URL}get_special_re_entries?project_id=${user?.projectId}`);
+      const response = await fetch(
+        `${BACKEND_API_URL}get_special_re_entries?project_id=${user?.projectId}`
+      );
 
       if (!response.ok) {
         const jsonError = await response.json();
@@ -55,7 +64,11 @@ function SpecialReEntryScreen() {
         throw new Error(t(response?.message || "errors.checkinFailure"));
       }
 
-      setAlertMessage(t(response.message || "errors.checkinSuccess", { name: response.subject_name }));
+      setAlertMessage(
+        t(response.message || "errors.checkinSuccess", {
+          name: response.subject_name,
+        })
+      );
       setAlertType("success");
       setAlertVisible(true);
 
@@ -94,27 +107,18 @@ function SpecialReEntryScreen() {
           ) : SpecialReEntries.length > 0 ? (
             <ScrollView contentContainerStyle={styles.scrollContent}>
               {SpecialReEntries.map((entry) => (
-                <View
-                  key={entry.subject?.id}
-                  style={styles.item}
-                >
-                  <Text style={styles.name}>
-                    {entry.subject?.name}
-                  </Text>
+                <View key={entry.subject?.id} style={styles.item}>
+                  <Text style={styles.name}>{entry.subject?.name}</Text>
                   <View style={styles.actions}>
                     <TouchableOpacity
-                      onPress={() =>
-                        HandleEntry(entry.subject?.id, true)
-                      }
+                      onPress={() => HandleEntry(entry.subject?.id, true)}
                       style={[styles.button, styles.acceptButton]}
                     >
                       <Text style={styles.buttonText}>{t("ui.accept")}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      onPress={() =>
-                        HandleEntry(entry.subject?.id, false)
-                      }
+                      onPress={() => HandleEntry(entry.subject?.id, false)}
                       style={[styles.button, styles.declineButton]}
                     >
                       <Text style={styles.buttonText}>{t("ui.decline")}</Text>
@@ -161,8 +165,8 @@ function SpecialReEntryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f4f4",
-    padding: 15,
+    backgroundColor: Theme.colors.backgroundBody,
+    padding: Theme.spacing.s4,
   },
   scrollContent: {
     paddingBottom: 100,
@@ -171,27 +175,29 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     fontSize: 26,
     fontWeight: "700",
-    color: "#222",
-    marginBottom: 20,
+    color: Theme.colors.textHeader,
+    marginBottom: Theme.spacing.s4,
     textAlign: "center",
   },
   item: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 12,
+    backgroundColor: Theme.colors.backgroundContainer,
+    borderRadius: Theme.radius.md,
+    padding: Theme.spacing.s3,
     marginVertical: 8,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: Theme.colors.borderDefault,
     elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   name: {
     fontSize: 16,
-    color: "#333",
+    color: Theme.colors.textBody,
     fontWeight: "600",
     flex: 1.5,
   },
@@ -202,18 +208,18 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   button: {
-    paddingVertical: 6,
+    paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 20,
-    minWidth: 70,
+    borderRadius: Theme.radius.lg,
+    minWidth: 80,
     alignItems: "center",
     justifyContent: "center",
   },
   acceptButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: Theme.colors.secondaryBorder,
   },
   declineButton: {
-    backgroundColor: "#F44336",
+    backgroundColor: Theme.colors.dangerBorder,
   },
   buttonText: {
     color: "#fff",
@@ -222,30 +228,32 @@ const styles = StyleSheet.create({
   },
   loading: {
     fontSize: 16,
-    color: "#666",
+    color: Theme.colors.textMuted,
     textAlign: "center",
     marginTop: 30,
   },
   error: {
     fontSize: 16,
-    color: "#d32f2f",
+    color: Theme.colors.dangerBorder,
     textAlign: "center",
     marginTop: 30,
     fontWeight: "bold",
   },
   noData: {
     fontSize: 16,
-    color: "#888",
+    color: Theme.colors.textMuted,
     textAlign: "center",
     marginTop: 30,
   },
   link: {
     paddingVertical: 15,
     paddingHorizontal: 20,
-    backgroundColor: "#007AFF",
+    backgroundColor: Theme.colors.buttonBg,
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: Theme.radius.md,
     marginVertical: 10,
+    borderWidth: 1,
+    borderColor: Theme.colors.primaryBorder,
   },
   text: {
     color: "white",
