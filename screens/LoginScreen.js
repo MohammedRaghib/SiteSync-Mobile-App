@@ -112,6 +112,8 @@ const LoginScreen = () => {
       backend1: prevURLs.backend2,
       backend2: prevURLs.backend1,
     }));
+
+    Alert.alert(t("ui.urlSwitched"));
   };
 
   const appVersion = Constants.expoConfig.version;

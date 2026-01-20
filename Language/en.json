@@ -50,7 +50,8 @@
     "cancel": "Cancel",
     "success": "Success",
     "checkinDeleteSuccess": "Check-in record deleted successfully.",
-    "checkoutDeleteSuccess": "Check-out record deleted successfully."
+    "checkoutDeleteSuccess": "Check-out record deleted successfully.",
+    "urlSwitched": "URL switched successfully."
   },
   "errors": {
     "already_checked_in": "Person already checked in.",

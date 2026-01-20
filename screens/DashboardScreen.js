@@ -342,6 +342,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    marginTop: Theme.spacing.s2,
     marginBottom: Theme.spacing.s2,
     textAlign: "center",
     color: Theme.colors.textHeader,
