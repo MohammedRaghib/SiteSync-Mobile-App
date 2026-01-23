@@ -38,8 +38,8 @@
     "checkIn": "Check In",
     "checkOut": "Check Out",
     "projects": "Projects",
-    "checkinSuccess": "{{name}} Checked in",
-    "checkoutSuccess": "{{name}} Checked out",
+    "checkinVerify": "{{name}} Checked in?",
+    "checkoutVerify": "{{name}} Checked out?",
     "late_check_in": "Late check-in recorded for {{name}}",
     "check_in_success": "Check in successful.",
     "check_out_success": "Check out successful.",
@@ -51,13 +51,16 @@
     "success": "Success",
     "checkinDeleteSuccess": "Check-in record deleted successfully.",
     "checkoutDeleteSuccess": "Check-out record deleted successfully.",
-    "urlSwitched": "URL switched successfully."
+    "urlSwitched": "URL switched successfully.",
+    "checkoutConfirmed": "Check out confirmed.",
+    "checkinConfirmed": "Check in confirmed.",
+    "specialReEntryConfirmed": "Special re-entry confirmed, awaiting supervisor approval."
   },
   "errors": {
     "already_checked_in": "Person already checked in.",
     "already_checked_out": "Person already checked out.",
     "authError": "Authentication error occurred.",
-    "await_supervisor_permission": "Await supervisor permission for re entry.",
+    "await_supervisor_permission": "{{ name }} requested re entry?",
     "checkinFailure": "Failed to check in",
     "checkoutFailure": "Failed to check out",
     "denied_re_entry": "Re-entry denied.",
@@ -88,6 +91,7 @@
     "role_info_missing": "User role information missing.",
     "serverError": "Server error occurred.",
     "subject_not_found": "No subject found.",
+    "subject_unathorized": "Subject is unathorized in system.",
     "supervisor_checkout_missing": "Can not check out before supervisor check out.",
     "supervisor_contact_error": "Unable to contact supervisors, contact supervisors manually.",
     "supervisor_no_project": "Supervisor does not have a project assigned.",
@@ -96,6 +100,8 @@
     "TimeAndLocationError": "Could not get required information for attendance.",
     "unassigned_project": "Supervisor is not assigned to this project.",
     "unsupported_role": "Login successful for other role.",
-    "user_profile_incomplete": "User profile incomplete."
+    "user_profile_incomplete": "User profile incomplete.",
+    "deleteAttendanceError": "Failed to delete attendance.",
+    "approveAttendanceError": "Failed to approve attendance."
   }
 }

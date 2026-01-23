@@ -65,7 +65,7 @@ function SpecialReEntryScreen() {
       }
 
       setAlertMessage(
-        t(response.message || "errors.checkinSuccess", {
+        t(response.message || "ui.checkinConfirmed", {
           name: response.subject_name,
         })
       );

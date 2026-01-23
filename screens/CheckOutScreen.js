@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import CameraLocationComponent from "../components/CameraLocationComponent";
 import useCheckInfo from "../services/UserContext";
 import useAttendanceAndChecks from "../services/useAttendanceChecks";
@@ -13,24 +13,42 @@ function CheckOutScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const { user, loggedIn } = useCheckInfo();
-  const { CheckOutAttendance } = useAttendanceAndChecks();
+  const { CheckOutAttendance, handleAttendance } = useAttendanceAndChecks();
   const { recognizeFace } = useFaceRecognition();
 
   const [alert, setAlert] = useState({
     visible: false,
     type: "success",
     message: "",
+    onConfirm: null,
+    onCancel: null,
+    confirmText: "✔️",
+    cancelText: "❌",
   });
 
-  const showAlert = (type, message) => {
+  const showAlert = (type, message, onConfirm = null, onCancel = null) => {
     setAlert({
       visible: true,
       type,
       message,
+      onConfirm,
+      onCancel,
+      confirmText: "✔️",
+      cancelText: "❌",
     });
   };
 
-  const closeAlert = () => setAlert({ ...alert, visible: false });
+  const closeAlert = () => setAlert((prev) => ({ ...prev, visible: false }));
+
+  const processAttendanceAction = async (id, action) => {
+    closeAlert();
+    const result = await handleAttendance(id, "checkout", action);
+    if (!result.success) {
+      showAlert("error", t(`errors.${action}AttendanceError`));
+    } else if (action === "approve") {
+      showAlert("success", t("ui.checkoutConfirmed"));
+    }
+  };
 
   const handlePictureTaken = async (photo) => {
     try {
@@ -48,30 +66,35 @@ function CheckOutScreen() {
         }
       }
 
-      const send = {
-        image: photo.uri,
-      };
-
+      const send = { image: photo.uri };
       const checkOut = await CheckOutAttendance(send);
 
-      if (!checkOut.success) {
+      if (checkOut.success) {
+        const message =
+          t("ui.checkoutVerify", {
+            name: checkOut.subject_name,
+          }) || `Confirm check-out for ${checkOut.subject_name}?`;
+
+        showAlert(
+          "info",
+          message,
+          () => processAttendanceAction(checkOut.attendance_id, "approve"),
+          () => processAttendanceAction(checkOut.attendance_id, "delete"),
+        );
+      } else {
         throw new Error(t(checkOut?.message || "errors.fetchError"));
       }
-
-      const message = t(checkOut.message || "attendance.checkoutSuccess", {name: checkOut.subject_name});
-      showAlert("success", message);
     } catch (error) {
-      if (error.message.includes("Network request failed")) {
-        showAlert("error", t("errors.networkError"));
-      } else {
-        showAlert("error", error.message);
-      }
+      const errorMessage = error.message.includes("Network request failed")
+        ? t("errors.networkError")
+        : error.message;
+      showAlert("error", errorMessage);
     }
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      {loggedIn && (
+    <View style={styles.container}>
+      {loggedIn ? (
         <>
           <CameraLocationComponent onPictureTaken={handlePictureTaken} />
           <CustomAlert
@@ -79,16 +102,37 @@ function CheckOutScreen() {
             type={alert.type}
             message={alert.message}
             onClose={closeAlert}
+            onConfirm={alert.onConfirm}
+            onCancel={alert.onCancel}
+            confirmText={alert.confirmText}
+            cancelText={alert.cancelText}
           />
         </>
-      )}
-      {!loggedIn && (
-        <TouchableOpacity style={styles.link} onPress={() => navigation.navigate("Login")}>
+      ) : (
+        <TouchableOpacity
+          style={styles.link}
+          onPress={() => navigation.navigate("Login")}
+        >
           <Text style={styles.text}>{t("ui.login")}</Text>
         </TouchableOpacity>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  link: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 18,
+    color: "#2196f3",
+  },
+});
 
 export default CheckOutScreen;

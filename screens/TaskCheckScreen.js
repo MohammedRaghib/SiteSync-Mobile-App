@@ -21,7 +21,7 @@ function TaskCheckScreen() {
   const { faceData } = route.params || {};
   const navigation = useNavigation();
   const { user, loggedIn, BACKEND_API_URLS } = useCheckInfo();
-  const { CheckOutAttendance } = useAttendanceAndChecks();
+  const { CheckOutAttendance, handleAttendance } = useAttendanceAndChecks();
 
   const [state, setState] = useState({
     tasks: [],
@@ -36,25 +36,33 @@ function TaskCheckScreen() {
     visible: false,
     type: "success",
     message: "",
+    onConfirm: null,
+    onCancel: null,
+    confirmText: "✔️",
+    cancelText: "❌",
   });
 
   const BACKEND_API_URL = BACKEND_API_URLS.backend1;
 
-  const showAlert = (type, message) => {
+  const showAlert = (type, message, onConfirm = null, onCancel = null) => {
     setAlert({
       visible: true,
       type,
       message,
+      onConfirm,
+      onCancel,
+      confirmText: "✔️",
+      cancelText: "❌",
     });
   };
 
-  const closeAlert = () => setAlert({ ...alert, visible: false });
+  const closeAlert = () => setAlert((prev) => ({ ...prev, visible: false }));
 
   const fetchTasks = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const response = await fetch(
-        `${BACKEND_API_URL}get_person_tasks/${faceData?.id}/`
+        `${BACKEND_API_URL}get_person_tasks/${faceData?.id}/`,
       );
       const data = await response.json();
 
@@ -67,6 +75,29 @@ function TaskCheckScreen() {
       setState((prev) => ({ ...prev, error: e.message }));
     } finally {
       setState((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  const processAttendanceAction = async (id, action) => {
+    closeAlert();
+    const result = await handleAttendance(id, "checkout", action);
+    if (!result.success) {
+      showAlert("error", t(`errors.${action}AttendanceError`));
+    } else {
+      if (action === "approve") {
+        showAlert("success", t("ui.checkoutConfirmed"));
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+          });
+        }, 1500);
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
+      }
     }
   };
 
@@ -95,7 +126,7 @@ function TaskCheckScreen() {
   const handleSubmit = async () => {
     setState((prev) => ({ ...prev, submitting: true }));
     try {
-      const success = await CheckOutAttendance({
+      const result = await CheckOutAttendance({
         ...faceData,
         is_work_completed: state.allTasksCompleted,
         is_equipment_returned: state.allEquipmentReturned,
@@ -103,26 +134,25 @@ function TaskCheckScreen() {
           !state.allTasksCompleted || !state.allEquipmentReturned,
       });
 
-      if (!success.success) {
-        throw new Error(t(success?.message || "errors.serverError"));
+      if (!result.success) {
+        throw new Error(t(result?.message || "errors.serverError"));
       }
+
+      const message = t("ui.checkoutVerify", {
+        name: result.subject_name || faceData.name,
+      });
 
       showAlert(
-        "success",
-        t(success?.message || "attendance.checkoutSuccess", {
-          name: success.subject_name,
-        })
+        "info",
+        message,
+        () => processAttendanceAction(result.attendance_id, "approve"),
+        () => processAttendanceAction(result.attendance_id, "delete"),
       );
-
-      setTimeout(() => {
-        navigation.navigate("Home");
-      }, 1500);
     } catch (error) {
-      if (error.message.includes("Network request failed")) {
-        showAlert("error", t("errors.networkError"));
-      } else {
-        showAlert("error", error.message);
-      }
+      const errorMsg = error.message.includes("Network request failed")
+        ? t("errors.networkError")
+        : error.message;
+      showAlert("error", errorMsg);
     } finally {
       setState((prev) => ({ ...prev, submitting: false }));
     }
@@ -167,6 +197,10 @@ function TaskCheckScreen() {
         type={alert.type}
         message={alert.message}
         onClose={closeAlert}
+        onConfirm={alert.onConfirm}
+        onCancel={alert.onCancel}
+        confirmText={alert.confirmText}
+        cancelText={alert.cancelText}
       />
 
       {user?.role === "supervisor" && (

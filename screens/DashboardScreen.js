@@ -111,60 +111,6 @@ const DashboardScreen = () => {
     }
   };
 
-  const handleDelete = (id, type) => {
-    const isCheckIn = type === "checkin";
-    const successMessageKey = isCheckIn
-      ? "ui.checkinDeleteSuccess"
-      : "ui.checkoutDeleteSuccess";
-
-    const deleteCheckIn = async () => {
-      setLoading(true);
-      setErrorMessage("");
-      try {
-        const response = await fetch(`${BACKEND_API_URL}delete_attendance/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, type }),
-        });
-        const jsonError = await response.json();
-        if (!response.ok) {
-          throw new Error(
-            t("errors." + jsonError.error_type || "errors.serverError")
-          );
-        }
-        setAlert({
-          visible: true,
-          type: "success",
-          message: t(successMessageKey),
-        });
-        const call_function =
-          type === "checkin" ? fetchCheckIns : fetchCheckouts;
-        call_function();
-      } catch (error) {
-        log.error(error);
-        setAlert({
-          visible: true,
-          type: "error",
-          message: t(error.message),
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    Alert.alert(
-      t("ui.confirmDeleteTitle"),
-      t("ui.confirmDeleteMessage", {
-        type: t(isCheckIn ? "ui.checkIn" : "ui.checkOut"),
-      }),
-      [
-        { text: t("ui.cancel"), style: "cancel" },
-        { text: t("ui.delete"), style: "destructive", onPress: deleteCheckIn },
-      ],
-      { cancelable: true }
-    );
-  };
-
   const handleTabChange = (tab) => {
     if (activeTab === tab) return;
     setActiveTab(tab);
@@ -218,16 +164,6 @@ const DashboardScreen = () => {
               })}
             </Text>
           </View>
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => handleDelete(checkout.id, "checkout")}
-          >
-            <Ionicons
-              name="trash-outline"
-              size={24}
-              color={Theme.colors.dangerBorder}
-            />
-          </TouchableOpacity>
         </View>
       ));
     }
@@ -253,16 +189,6 @@ const DashboardScreen = () => {
             })}
           </Text>
         </View>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => handleDelete(attendance.id, "checkin")}
-        >
-          <Ionicons
-            name="trash-outline"
-            size={24}
-            color={Theme.colors.dangerBorder}
-          />
-        </TouchableOpacity>
       </View>
     ));
   };

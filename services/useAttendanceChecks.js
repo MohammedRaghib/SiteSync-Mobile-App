@@ -64,18 +64,45 @@ const useAttendanceAndChecks = () => {
         800,
         800,
         "JPEG",
-        quality
+        quality,
       );
 
       log.info(
         `🗜️ Image compressed (${quality}% quality):`,
-        resized.size ? `${(resized.size / 1024).toFixed(1)} KB` : "unknown size"
+        resized.size
+          ? `${(resized.size / 1024).toFixed(1)} KB`
+          : "unknown size",
       );
 
       return resized.uri;
     } catch (err) {
-      log.error("⚠️ Image compression failed, using original file:", err.message);
+      log.error(
+        "⚠️ Image compression failed, using original file:",
+        err.message,
+      );
       return uri;
+    }
+  };
+
+  const handleAttendance = async (id, type, action) => {
+    try {
+      const method = action === "delete" ? "DELETE" : "POST";
+      const response = await fetch(`${BACKEND_API_URL}handle_attendance/`, {
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, type }),
+      });
+
+      const jsonError = await response.json();
+
+      if (!response.ok) {
+        throw new Error(t("errors." + (jsonError.error_type || "serverError")));
+      }
+
+      return { success: true };
+    } catch (error) {
+      log.error(error);
+      return { success: false };
     }
   };
 
@@ -83,8 +110,11 @@ const useAttendanceAndChecks = () => {
     endpoint,
     faceData,
     isCheckIn,
-    additionalFields = {}
+    additionalFields = {},
   ) => {
+    let attendance_id;
+    let subject_name;
+
     try {
       log.info("🔄 Starting attendance submission...");
       const attendanceInfo = await getAttendanceInfo();
@@ -95,18 +125,33 @@ const useAttendanceAndChecks = () => {
       formData.append("attendance_monitor_id", user.id);
       formData.append("attendance_project_id", user.projectId);
       formData.append("attendance_timestamp", attendanceInfo.timestamp);
-      formData.append("attendance_location", JSON.stringify(attendanceInfo.location));
-      formData.append("attendance_device_manufacturer", attendanceInfo.device.manufacturer || "");
-      formData.append("attendance_device_brand", attendanceInfo.device.brand || "");
-      formData.append("attendance_device_model", attendanceInfo.device.model || "");
+      formData.append(
+        "attendance_location",
+        JSON.stringify(attendanceInfo.location),
+      );
+      formData.append(
+        "attendance_device_manufacturer",
+        attendanceInfo.device.manufacturer || "",
+      );
+      formData.append(
+        "attendance_device_brand",
+        attendanceInfo.device.brand || "",
+      );
+      formData.append(
+        "attendance_device_model",
+        attendanceInfo.device.model || "",
+      );
       formData.append("attendance_is_check_in", isCheckIn);
       formData.append(
         `attendance_is_supervisor_check_${isCheckIn ? "in" : "out"}`,
-        user.role === "supervisor"
+        user.role === "supervisor",
       );
 
       for (const key in additionalFields) {
-        if (additionalFields[key] !== undefined && additionalFields[key] !== null) {
+        if (
+          additionalFields[key] !== undefined &&
+          additionalFields[key] !== null
+        ) {
           formData.append(key, additionalFields[key]);
         }
       }
@@ -144,19 +189,29 @@ const useAttendanceAndChecks = () => {
       }
 
       log.info("📥 Server responded with:", json, "status:", response.status);
+      attendance_id = json.attendance_id || null;
+      subject_name = json?.subject_name || "Unkown Person";
 
       if (!response.ok) {
         log.error("❌ Server error response:", json.message || "Unknown error");
         throw new Error("errors." + (json.error_type || "serverError"));
       }
 
-      let subject_name = json.subject_name || "Unkown Person";
-
       log.info(`✅ Check-${isCheckIn ? "in" : "out"} success`);
-      return { message: `ui.check${isCheckIn ? "in" : "out"}Success`, subject_name: subject_name, success: true };
+      return {
+        message: `ui.check${isCheckIn ? "in" : "out"}Confirmed`,
+        subject_name: subject_name,
+        attendance_id: attendance_id,
+        success: true,
+      };
     } catch (error) {
       log.error("🚨 Attendance error:", error.message);
-      return { message: error.message, success: false };
+      return {
+        message: error.message,
+        attendance_id: attendance_id,
+        subject_name: subject_name,
+        success: false,
+      };
     }
   };
 
@@ -189,6 +244,7 @@ const useAttendanceAndChecks = () => {
     CheckOutAttendance,
     SpecialReEntry,
     compressImageIfNeeded,
+    handleAttendance,
   };
 };
 
