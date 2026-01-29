@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
+import { Theme } from "../constants/Theme";
 
 const { width } = Dimensions.get("window");
 
@@ -21,9 +22,9 @@ export default function CustomAlert({
   cancelText = "Cancel",
 }) {
   const colors = {
-    error: "#EF4444",
+    error: Theme.colors.dangerBorder,
     warning: "#F59E0B",
-    success: "#10B981",
+    success: Theme.colors.primaryBorder,
     info: "#3B82F6",
   };
 
@@ -93,9 +94,9 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: width * 0.8,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    overflow: "hidden", // Ensures header strip follows border radius
+    backgroundColor: Theme.colors.backgroundContainer,
+    borderRadius: Theme.radius.lg,
+    overflow: "hidden",
     elevation: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
@@ -106,49 +107,39 @@ const styles = StyleSheet.create({
     height: 8,
     width: "100%",
   },
-  cornerClose: {
-    position: "absolute",
-    top: 15,
-    right: 15,
-    padding: 5,
-    zIndex: 10,
-  },
-  cornerCloseText: {
-    fontSize: 18,
-    color: "#9CA3AF",
-    fontWeight: "bold",
-  },
   content: {
-    padding: 25,
-    paddingTop: 40,
+    padding: Theme.spacing.s6,
+    paddingTop: Theme.spacing.s6 * 1.5,
     alignItems: "center",
   },
   messageText: {
-    color: "#1F2937",
+    color: Theme.colors.textBody,
     fontSize: 18,
     lineHeight: 24,
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: Theme.spacing.s6,
     fontWeight: "500",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    gap: 12,
+    gap: Theme.spacing.s3,
   },
   button: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: Theme.spacing.s3,
+    borderRadius: Theme.radius.md,
     alignItems: "center",
     justifyContent: "center",
   },
   cancelButton: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Theme.colors.secondaryLight,
+    borderWidth: 1,
+    borderColor: Theme.colors.borderDefault,
   },
   cancelButtonText: {
-    color: "#4B5563",
+    color: Theme.colors.textMuted,
     fontSize: 16,
     fontWeight: "600",
   },

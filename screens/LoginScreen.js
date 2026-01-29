@@ -108,12 +108,16 @@ const LoginScreen = () => {
   };
 
   const handleSwitchUrl = () => {
-    setBackendUrls((prevURLs) => ({
-      backend1: prevURLs.backend2,
-      backend2: prevURLs.backend1,
-    }));
+    setBackendUrls((prevURLs) => {
+      const newState = {
+        backend1: prevURLs.backend2,
+        backend2: prevURLs.backend1,
+      };
 
-    setErrorMessage(BACKEND_API_URL);
+      setErrorMessage(`Switched to: ${newState.backend1}`);
+
+      return newState;
+    });
   };
 
   const appVersion = Constants.expoConfig.version;
